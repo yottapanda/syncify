@@ -1,0 +1,6 @@
+#spinner{
+    display:none;
+}
+.htmx-request#spinner{
+    display:block;
+}
