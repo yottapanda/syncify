@@ -7,6 +7,7 @@ import (
 	"github.com/chi-middleware/logrus-logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/sirupsen/logrus"
 	"github.com/thechubbypanda/spotisync/views"
 	"github.com/zmb3/spotify/v2"
@@ -16,12 +17,22 @@ import (
 	"time"
 )
 
+var config Config
+
 var sm = scs.New()
 
 func main() {
-	logrus.SetLevel(logrus.DebugLevel)
+	err := cleanenv.ReadEnv(&config)
+	if err != nil {
+		logrus.Fatalln("error reading config: ", err)
+		return
+	}
+
+	logrus.SetLevel(config.LogLevel)
 
 	gob.Register(oauth2.Token{})
+
+	SetOauthConfig(config)
 
 	sm.Store = memstore.New()
 

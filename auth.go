@@ -6,21 +6,24 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 	"net/http"
-	"os"
 	"strings"
 )
 
-var oauthConfig = oauth2.Config{
-	ClientID:     os.Getenv("CLIENT_ID"),
-	ClientSecret: os.Getenv("CLIENT_SECRET"),
-	Endpoint: oauth2.Endpoint{
-		AuthURL:       "https://accounts.spotify.com/authorize",
-		DeviceAuthURL: "",
-		TokenURL:      "https://accounts.spotify.com/api/token",
-		AuthStyle:     0,
-	},
-	RedirectURL: strings.Join([]string{os.Getenv("URL"), "callback"}, "/"),
-	Scopes:      []string{"playlist-read-private", "user-library-read", "playlist-modify-private", "playlist-modify-public"},
+var oauthConfig oauth2.Config
+
+func SetOauthConfig(config Config) {
+	oauthConfig = oauth2.Config{
+		ClientID:     config.ClientID,
+		ClientSecret: config.ClientSecret,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:       "https://accounts.spotify.com/authorize",
+			DeviceAuthURL: "",
+			TokenURL:      "https://accounts.spotify.com/api/token",
+			AuthStyle:     0,
+		},
+		RedirectURL: strings.Join([]string{config.Url, "callback"}, "/"),
+		Scopes:      []string{"playlist-read-private", "user-library-read", "playlist-modify-private", "playlist-modify-public"},
+	}
 }
 
 func randomState() (string, error) {
