@@ -74,7 +74,7 @@ func Outcome(count int, err error) g.Node {
 	} else if err != nil {
 		o = g.Text("Error: " + err.Error())
 	} else {
-		o = g.Text("Successfully synchronized " + strconv.Itoa(count) + " tracks to the SpotiSync playlist")
+		o = g.Text("Successfully synchronized " + strconv.Itoa(count) + " tracks to your SpotiSync playlist")
 	}
 	return Div(ID("outcome"), Class("text-gray-500"), o)
 }
