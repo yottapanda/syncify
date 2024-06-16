@@ -37,11 +37,12 @@ func getLikedTrackIds(r *http.Request, s *spotify.Client) ([]spotify.ID, error) 
 	return trackIds, nil
 }
 
-func getPlaylist(r *http.Request, s *spotify.Client, userId string) (*spotify.SimplePlaylist, error) {
-	playlists, err := s.GetPlaylistsForUser(r.Context(), userId)
+func getPlaylist(r *http.Request, s *spotify.Client, user *spotify.PrivateUser) (*spotify.SimplePlaylist, error) {
+	playlists, err := s.GetPlaylistsForUser(r.Context(), user.ID)
 	if err != nil {
 		return nil, err
 	}
+	logrus.Traceln(user.ID, ":", "reading page", 0, " of liked songs")
 	for _, p := range playlists.Playlists {
 		if p.Name == "SpotiSync" {
 			return &p, nil
@@ -56,6 +57,7 @@ func getPlaylist(r *http.Request, s *spotify.Client, userId string) (*spotify.Si
 		if err != nil {
 			return nil, err
 		}
+		logrus.Traceln(user.ID, ":", "reading page", page, " of liked songs")
 		for _, p := range playlists.Playlists {
 			if p.Name == "SpotiSync" {
 				return &p, nil
@@ -63,17 +65,17 @@ func getPlaylist(r *http.Request, s *spotify.Client, userId string) (*spotify.Si
 		}
 	}
 
-	playlist, err := s.CreatePlaylistForUser(r.Context(), userId, "SpotiSync", "A copy of your 'Liked Songs' playlist by SpotiSync", false, false)
+	playlist, err := s.CreatePlaylistForUser(r.Context(), user.ID, "SpotiSync", "A copy of your 'Liked Songs' playlist by SpotiSync", false, false)
 	if err != nil {
 		return nil, err
 	}
 
-	logrus.Debugln(userId, ":", "created playlist", playlist.ID)
+	logrus.Debugln(user.ID, ":", "created playlist", playlist.ID)
 
 	return &playlist.SimplePlaylist, nil
 }
 
-func truncatePlaylist(r *http.Request, s *spotify.Client, playlist *spotify.SimplePlaylist) error {
+func truncatePlaylist(r *http.Request, s *spotify.Client, user *spotify.PrivateUser, playlist *spotify.SimplePlaylist) error {
 	var trackIds []spotify.ID
 
 	// TODO (wasteful) https://github.com/zmb3/spotify/issues/262
@@ -81,6 +83,7 @@ func truncatePlaylist(r *http.Request, s *spotify.Client, playlist *spotify.Simp
 	if err != nil {
 		return err
 	}
+	logrus.Traceln(user.ID, ":", "reading page", 0, " of tracks from playlist", playlist.ID)
 	for _, t := range tracks.Items {
 		trackIds = append(trackIds, t.Track.Track.ID)
 	}
@@ -93,6 +96,7 @@ func truncatePlaylist(r *http.Request, s *spotify.Client, playlist *spotify.Simp
 		if err != nil {
 			return err
 		}
+		logrus.Traceln(user.ID, ":", "reading page", page, " of tracks from playlist", playlist.ID)
 		for _, t := range tracks.Items {
 			trackIds = append(trackIds, t.Track.Track.ID)
 		}
@@ -100,7 +104,7 @@ func truncatePlaylist(r *http.Request, s *spotify.Client, playlist *spotify.Simp
 
 	if len(trackIds) > 0 {
 		for i := 0; i <= len(trackIds)/100; i++ {
-			logrus.Traceln("removing tracks", i*100, "-", min((i+1)*100, len(trackIds))-1, "from", playlist.ID)
+			logrus.Traceln(user.ID, ":", "removing tracks", i*100, "-", min((i+1)*100, len(trackIds))-1, "from", playlist.ID)
 			_, err := s.RemoveTracksFromPlaylist(r.Context(), playlist.ID, trackIds[i*100:min((i+1)*100, len(trackIds))]...)
 			if err != nil {
 				return err
@@ -122,7 +126,7 @@ func sync(r *http.Request, token *oauth2.Token) (int, error) {
 
 	logrus.Debugln(user.ID, ":", "starting sync")
 
-	playlist, err := getPlaylist(r, s, user.ID)
+	playlist, err := getPlaylist(r, s, user)
 	if err != nil {
 		logrus.Errorln(user.ID, ":", err)
 		return 0, err
@@ -130,7 +134,7 @@ func sync(r *http.Request, token *oauth2.Token) (int, error) {
 
 	logrus.Debugln(user.ID, ":", "using playlist", playlist.ID)
 
-	err = truncatePlaylist(r, s, playlist)
+	err = truncatePlaylist(r, s, user, playlist)
 	if err != nil {
 		logrus.Errorln(user.ID, ":", err)
 		return 0, err
