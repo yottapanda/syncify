@@ -13,7 +13,7 @@ func Root(user *spotify.PrivateUser, count int, err error) g.Node {
 	return Page(
 		Div(Class("flex flex-col items-center justify-center h-screen gap-6"),
 			Div(Class("flex flex-col items-center gap-2"),
-				H1(Class("text-3xl font-bold"), g.Text("SpotiSync")),
+				H1(Class("text-3xl font-bold"), g.Text("Syncify")),
 				P(Class("text-lg text-gray-600"), g.Text("Sync your Spotify 'Liked Songs' playlist to a sharable one.")),
 				UserText(user),
 			),
@@ -74,7 +74,7 @@ func Outcome(count int, err error) g.Node {
 	} else if err != nil {
 		o = g.Text("Error: " + err.Error())
 	} else {
-		o = g.Text("Successfully synchronized " + strconv.Itoa(count) + " tracks to your SpotiSync playlist")
+		o = g.Text("Successfully synchronized " + strconv.Itoa(count) + " tracks to your Syncify playlist")
 	}
 	return Div(ID("outcome"), Class("text-gray-500"), o)
 }

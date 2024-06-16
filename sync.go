@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"github.com/sirupsen/logrus"
-	"github.com/thechubbypanda/spotisync/views"
+	"github.com/thechubbypanda/syncify/views"
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
 	"golang.org/x/oauth2"
@@ -44,7 +44,7 @@ func getPlaylist(r *http.Request, s *spotify.Client, user *spotify.PrivateUser) 
 	}
 	logrus.Traceln(user.ID, ":", "reading page", 0, " of liked songs")
 	for _, p := range playlists.Playlists {
-		if p.Name == "SpotiSync" {
+		if p.Name == "Syncify" {
 			return &p, nil
 		}
 	}
@@ -59,13 +59,13 @@ func getPlaylist(r *http.Request, s *spotify.Client, user *spotify.PrivateUser) 
 		}
 		logrus.Traceln(user.ID, ":", "reading page", page, " of liked songs")
 		for _, p := range playlists.Playlists {
-			if p.Name == "SpotiSync" {
+			if p.Name == "Syncify" {
 				return &p, nil
 			}
 		}
 	}
 
-	playlist, err := s.CreatePlaylistForUser(r.Context(), user.ID, "SpotiSync", "A copy of your 'Liked Songs' playlist by SpotiSync", false, false)
+	playlist, err := s.CreatePlaylistForUser(r.Context(), user.ID, "Syncify", "A copy of your 'Liked Songs' playlist by Syncify", false, false)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func sync(r *http.Request, token *oauth2.Token) (int, error) {
 		}
 	}
 
-	logrus.Debugln(user.ID, ":", "sync complete")
+	logrus.Infoln(user.ID, ":", "sync complete for", len(trackIds), "songs")
 
 	return len(trackIds), nil
 }

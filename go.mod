@@ -1,4 +1,4 @@
-module github.com/thechubbypanda/spotisync
+module github.com/thechubbypanda/syncify
 
 go 1.22.3
 

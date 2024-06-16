@@ -1,6 +1,6 @@
 services:
-  spotisync:
-#    image: ghcr.io/thechubbypanda/spotisync:main
+  syncify:
+#    image: ghcr.io/thechubbypanda/syncify:main
     build: .
     env_file:
       - .env

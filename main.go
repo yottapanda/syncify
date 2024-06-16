@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/sirupsen/logrus"
-	"github.com/thechubbypanda/spotisync/views"
+	"github.com/thechubbypanda/syncify/views"
 	"github.com/zmb3/spotify/v2"
 	"github.com/zmb3/spotify/v2/auth"
 	"golang.org/x/oauth2"
@@ -39,7 +39,7 @@ func main() {
 	sm.Cookie.Secure = false
 	sm.Cookie.HttpOnly = true
 	sm.Cookie.Persist = false
-	sm.Cookie.Name = "spotisync_session"
+	sm.Cookie.Name = "syncify_session"
 	sm.Cookie.SameSite = http.SameSiteLaxMode
 
 	r := chi.NewRouter()

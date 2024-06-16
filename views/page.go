@@ -8,7 +8,7 @@ import (
 
 func Page(contents ...g.Node) g.Node {
 	return c.HTML5(c.HTML5Props{
-		Title:    "SpotiSync",
+		Title:    "Syncify",
 		Language: "en",
 		Head: []g.Node{
 			Script(Src("https://unpkg.com/htmx.org@1.9.12")),

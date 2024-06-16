@@ -4,14 +4,14 @@ WORKDIR /build
 
 COPY . .
 
-RUN go build -o out/spotisync .
+RUN go build -o out/syncify .
 
 FROM docker.io/library/alpine:latest
 
 WORKDIR /app
 
-COPY --from=build /build/out/spotisync /bin/
+COPY --from=build /build/out/syncify /bin/
 
 COPY static static
 
-CMD ["spotisync"]
+CMD ["syncify"]
