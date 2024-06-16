@@ -20,7 +20,7 @@ var oauthConfig = oauth2.Config{
 		AuthStyle:     0,
 	},
 	RedirectURL: strings.Join([]string{os.Getenv("URL"), "callback"}, "/"),
-	Scopes:      []string{"user-library-read", "playlist-read-public", "playlist-modify-public"},
+	Scopes:      []string{"playlist-read-private", "user-library-read", "playlist-modify-private", "playlist-modify-public"},
 }
 
 func randomState() (string, error) {

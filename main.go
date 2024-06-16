@@ -21,8 +21,6 @@ var sm = scs.New()
 func main() {
 	logrus.SetLevel(logrus.DebugLevel)
 
-	logrus.Debugln(oauthConfig.RedirectURL)
-
 	gob.Register(oauth2.Token{})
 
 	sm.Store = memstore.New()
