@@ -7,6 +7,7 @@ import (
 	"github.com/chi-middleware/logrus-logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/sirupsen/logrus"
 	"github.com/thechubbypanda/syncify/views"
@@ -48,6 +49,13 @@ func main() {
 		logger.Logger("router", logrus.StandardLogger()),
 		middleware.StripSlashes,
 		sm.LoadAndSave,
+		cors.Handler(cors.Options{
+			AllowedOrigins:   []string{"http://localhost:8000", "https://spotisync.thechubbypanda.dev"},
+			AllowedMethods:   []string{"GET"},
+			AllowedHeaders:   []string{},
+			ExposedHeaders:   []string{},
+			AllowCredentials: true,
+		}),
 	)
 
 	r.Route("/", func(r chi.Router) {

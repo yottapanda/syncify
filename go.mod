@@ -6,6 +6,7 @@ require (
 	github.com/alexedwards/scs/v2 v2.8.0
 	github.com/chi-middleware/logrus-logger v0.3.0
 	github.com/go-chi/chi/v5 v5.0.12
+	github.com/go-chi/cors v1.2.1
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/maragudk/gomponents v0.20.3
 	github.com/maragudk/gomponents-htmx v0.5.0
