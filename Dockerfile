@@ -20,8 +20,10 @@ FROM docker.io/library/alpine:latest
 
 WORKDIR /app
 
+COPY static static
+
 COPY --from=build-go /build/out/syncify /bin/
 
-COPY --from=build-tailwind /build/static static
+COPY --from=build-tailwind /build/static/stylesheet.css static/
 
 CMD ["syncify"]
