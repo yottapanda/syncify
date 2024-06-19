@@ -56,6 +56,12 @@ func main() {
 			ExposedHeaders:   []string{},
 			AllowCredentials: true,
 		}),
+		middleware.SetHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' unpkg.com; style-src 'self' 'unsafe-inline'"),
+		middleware.SetHeader("Strict-Transport-Security", "max-age=300"),
+		middleware.SetHeader("X-Frame-Options", "DENY"),
+		middleware.SetHeader("X-Content-Type-Options", "nosniff"),
+		middleware.SetHeader("Referrer-Policy", "strict-origin"),
+		middleware.SetHeader("Permissions-Policy", ""),
 	)
 
 	r.Route("/", func(r chi.Router) {
