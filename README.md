@@ -37,7 +37,7 @@ Then you fill them into a `.env` file in the root of the repo, see the [example 
 
 ### Option 1: Docker Compose
 
-The quickest option to get up and running is running the following:
+The quickest option to get up and running is by executing the following commands after cloning the repo:
 
 ```shell
 docker-compose build
