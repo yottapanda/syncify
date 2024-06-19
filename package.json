@@ -3,7 +3,7 @@
     "tailwindcss": "^3.4.4"
   },
   "scripts": {
-    "run": "npx tailwindcss -i stylesheet.css -o static/stylesheet.css",
+    "build": "npx tailwindcss -i stylesheet.css -o static/stylesheet.css",
     "watch": "npx tailwindcss -w -i stylesheet.css -o static/stylesheet.css"
   }
 }

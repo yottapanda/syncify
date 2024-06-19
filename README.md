@@ -26,3 +26,40 @@ Syncify is primarily written in Golang using:
 - [Tailwind CSS](https://tailwindcss.com/)
 
 This was my first time using Tailwind CSS and I must say, alongside Gomponents, it has made me reconsider my dislike of frontend development!
+
+## Running Locally
+
+### Spotify App
+
+You'll need your own Spotify app in their [developer console](https://developer.spotify.com/dashboard). From there you can grab an OAuth2 Client ID and Client Secret to users to log in.
+
+Then you fill them into a `.env` file in the root of the repo, see the [example .env file](example.env).
+
+### Option 1: Docker Compose
+
+The quickest option to get up and running is running the following:
+
+```shell
+docker-compose build
+docker-compose up -d
+```
+
+### Option 2: Manual
+
+1. Build the Tailwind CSS:
+
+    ```shell
+    npm i && npm run build
+    ```
+
+2. Export the variables in [example.env](example.env) e.g.
+
+    ```shell
+    export CLIENT_SECRET=thisisdefinitelyasecret
+    ```
+
+3. Start the server
+
+    ```shell
+    go run .
+    ```
