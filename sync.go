@@ -115,13 +115,13 @@ func truncatePlaylist(r *http.Request, s *spotify.Client, user *spotify.PrivateU
 	return nil
 }
 
-func sync(r *http.Request, token *oauth2.Token) (int, error) {
+func sync(r *http.Request, token *oauth2.Token) (int, string, error) {
 	s := spotify.New(spotifyauth.New().Client(r.Context(), token))
 
 	user, err := s.CurrentUser(r.Context())
 	if err != nil {
 		logrus.Errorln("failed to fetch user: ", err)
-		return 0, err
+		return 0, "", err
 	}
 
 	logrus.Debugln(user.ID, ":", "starting sync")
@@ -129,7 +129,7 @@ func sync(r *http.Request, token *oauth2.Token) (int, error) {
 	playlist, err := getPlaylist(r, s, user)
 	if err != nil {
 		logrus.Errorln(user.ID, ":", err)
-		return 0, err
+		return 0, "", err
 	}
 
 	logrus.Debugln(user.ID, ":", "using playlist", playlist.ID)
@@ -137,7 +137,7 @@ func sync(r *http.Request, token *oauth2.Token) (int, error) {
 	err = truncatePlaylist(r, s, user, playlist)
 	if err != nil {
 		logrus.Errorln(user.ID, ":", err)
-		return 0, err
+		return 0, "", err
 	}
 
 	logrus.Debugln(user.ID, ":", "truncated playlist", playlist.ID)
@@ -145,7 +145,7 @@ func sync(r *http.Request, token *oauth2.Token) (int, error) {
 	trackIds, err := getLikedTrackIds(r, s)
 	if err != nil {
 		logrus.Errorln(user.ID, ":", err)
-		return 0, err
+		return 0, "", err
 	}
 
 	logrus.Debugln(user.ID, ":", "found", len(trackIds), "liked songs")
@@ -156,14 +156,14 @@ func sync(r *http.Request, token *oauth2.Token) (int, error) {
 			_, err := s.AddTracksToPlaylist(r.Context(), playlist.ID, trackIds[i*100:min((i+1)*100, len(trackIds))]...)
 			if err != nil {
 				logrus.Errorln(user.ID, ":", err)
-				return 0, err
+				return 0, "", err
 			}
 		}
 	}
 
 	logrus.Infoln(user.ID, ":", "sync complete for", len(trackIds), "songs")
 
-	return len(trackIds), nil
+	return len(trackIds), playlist.ExternalURLs["spotify"], nil
 }
 
 func Sync(w http.ResponseWriter, r *http.Request) {
@@ -174,8 +174,8 @@ func Sync(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	count, err := sync(r, &token)
-	err = views.Outcome(count, err).Render(w)
+	count, playlistUrl, err := sync(r, &token)
+	err = views.Outcome(count, err, playlistUrl).Render(w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

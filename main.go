@@ -77,7 +77,7 @@ func main() {
 func Root(w http.ResponseWriter, r *http.Request) {
 	token, ok := sm.Get(r.Context(), "token").(oauth2.Token)
 	if !ok || token.Expiry.Before(time.Now()) {
-		err := views.Root(nil, -1, nil).Render(w)
+		err := views.Root(nil, -1, nil, "").Render(w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -93,7 +93,7 @@ func Root(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = views.Root(user, -1, nil).Render(w)
+	err = views.Root(user, -1, nil, "").Render(w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
