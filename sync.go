@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"github.com/sirupsen/logrus"
+	"github.com/thechubbypanda/syncify/model"
 	"github.com/thechubbypanda/syncify/views"
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
@@ -115,13 +116,13 @@ func truncatePlaylist(r *http.Request, s *spotify.Client, user *spotify.PrivateU
 	return nil
 }
 
-func sync(r *http.Request, token *oauth2.Token) (int, string, error) {
+func sync(r *http.Request, token *oauth2.Token) model.SyncResponse {
 	s := spotify.New(spotifyauth.New().Client(r.Context(), token))
 
 	user, err := s.CurrentUser(r.Context())
 	if err != nil {
 		logrus.Errorln("failed to fetch user: ", err)
-		return 0, "", err
+		return model.SyncResponse{Err: err}
 	}
 
 	logrus.Debugln(user.ID, ":", "starting sync")
@@ -129,7 +130,7 @@ func sync(r *http.Request, token *oauth2.Token) (int, string, error) {
 	playlist, err := getPlaylist(r, s, user)
 	if err != nil {
 		logrus.Errorln(user.ID, ":", err)
-		return 0, "", err
+		return model.SyncResponse{Err: err}
 	}
 
 	logrus.Debugln(user.ID, ":", "using playlist", playlist.ID)
@@ -137,7 +138,7 @@ func sync(r *http.Request, token *oauth2.Token) (int, string, error) {
 	err = truncatePlaylist(r, s, user, playlist)
 	if err != nil {
 		logrus.Errorln(user.ID, ":", err)
-		return 0, "", err
+		return model.SyncResponse{Err: err}
 	}
 
 	logrus.Debugln(user.ID, ":", "truncated playlist", playlist.ID)
@@ -145,7 +146,7 @@ func sync(r *http.Request, token *oauth2.Token) (int, string, error) {
 	trackIds, err := getLikedTrackIds(r, s)
 	if err != nil {
 		logrus.Errorln(user.ID, ":", err)
-		return 0, "", err
+		return model.SyncResponse{Err: err}
 	}
 
 	logrus.Debugln(user.ID, ":", "found", len(trackIds), "liked songs")
@@ -156,14 +157,17 @@ func sync(r *http.Request, token *oauth2.Token) (int, string, error) {
 			_, err := s.AddTracksToPlaylist(r.Context(), playlist.ID, trackIds[i*100:min((i+1)*100, len(trackIds))]...)
 			if err != nil {
 				logrus.Errorln(user.ID, ":", err)
-				return 0, "", err
+				return model.SyncResponse{Err: err}
 			}
 		}
 	}
 
 	logrus.Infoln(user.ID, ":", "sync complete for", len(trackIds), "songs")
 
-	return len(trackIds), playlist.ExternalURLs["spotify"], nil
+	return model.SyncResponse{
+		Count:       len(trackIds),
+		PlaylistUrl: playlist.ExternalURLs["spotify"],
+	}
 }
 
 func Sync(w http.ResponseWriter, r *http.Request) {
@@ -174,8 +178,12 @@ func Sync(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	count, playlistUrl, err := sync(r, &token)
-	err = views.Outcome(count, err, playlistUrl).Render(w)
+	syncResponse := sync(r, &token)
+	err := views.Outcome(model.Model{
+		Plausible:   nil,
+		User:        nil,
+		SyncOutcome: &syncResponse,
+	}).Render(w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

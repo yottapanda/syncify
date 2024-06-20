@@ -10,6 +10,7 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/sirupsen/logrus"
 	"github.com/thechubbypanda/syncify/config"
+	"github.com/thechubbypanda/syncify/model"
 	"github.com/thechubbypanda/syncify/views"
 	"github.com/zmb3/spotify/v2"
 	"github.com/zmb3/spotify/v2/auth"
@@ -84,7 +85,7 @@ func main() {
 func Root(w http.ResponseWriter, r *http.Request) {
 	token, ok := sm.Get(r.Context(), "token").(oauth2.Token)
 	if !ok || token.Expiry.Before(time.Now()) {
-		err := views.Root(cfg.Plausible, nil, -1, nil, "").Render(w)
+		err := views.Root(model.Model{Plausible: &cfg.Plausible}).Render(w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -100,7 +101,10 @@ func Root(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = views.Root(cfg.Plausible, user, -1, nil, "").Render(w)
+	err = views.Root(model.Model{
+		Plausible: &cfg.Plausible,
+		User:      user,
+	}).Render(w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
