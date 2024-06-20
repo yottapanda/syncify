@@ -49,10 +49,13 @@ func main() {
 
 	cspParts := []string{"default-src 'self'", "style-src 'self' 'unsafe-inline'"}
 	scriptSources := []string{"unpkg.com"}
+	var connectSources []string
 	if cfg.Plausible.ScriptUrl != "" {
 		scriptSources = append(scriptSources, cfg.Plausible.Origin)
+		connectSources = append(connectSources, cfg.Plausible.Origin)
 	}
 	cspParts = append(cspParts, "script-src "+strings.Join(scriptSources, " "))
+	cspParts = append(cspParts, "connect-src "+strings.Join(connectSources, " "))
 
 	r.Use(
 		logger.Logger("router", logrus.StandardLogger()),
