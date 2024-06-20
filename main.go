@@ -15,6 +15,7 @@ import (
 	"github.com/zmb3/spotify/v2/auth"
 	"golang.org/x/oauth2"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -37,7 +38,7 @@ func main() {
 
 	sm.Store = memstore.New()
 
-	sm.Cookie.Secure = false
+	sm.Cookie.Secure = strings.HasPrefix(config.Url, "https")
 	sm.Cookie.HttpOnly = true
 	sm.Cookie.Persist = false
 	sm.Cookie.Name = "syncify_session"
