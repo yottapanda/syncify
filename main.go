@@ -9,6 +9,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/sirupsen/logrus"
+	"github.com/thechubbypanda/syncify/config"
 	"github.com/thechubbypanda/syncify/views"
 	"github.com/zmb3/spotify/v2"
 	"github.com/zmb3/spotify/v2/auth"
@@ -18,26 +19,26 @@ import (
 	"time"
 )
 
-var config Config
+var cfg config.Config
 
 var sm = scs.New()
 
 func main() {
-	err := cleanenv.ReadEnv(&config)
+	err := cleanenv.ReadEnv(&cfg)
 	if err != nil {
-		logrus.Fatalln("error reading config: ", err)
+		logrus.Fatalln("error reading cfg: ", err)
 		return
 	}
 
-	logrus.SetLevel(config.LogLevel)
+	logrus.SetLevel(cfg.LogLevel)
 
 	gob.Register(oauth2.Token{})
 
-	SetOauthConfig(config)
+	SetOauthConfig(cfg)
 
 	sm.Store = memstore.New()
 
-	sm.Cookie.Secure = strings.HasPrefix(config.Url, "https")
+	sm.Cookie.Secure = strings.HasPrefix(cfg.Url, "https")
 	sm.Cookie.HttpOnly = true
 	sm.Cookie.Persist = false
 	sm.Cookie.Name = "syncify_session"
@@ -45,11 +46,18 @@ func main() {
 
 	r := chi.NewRouter()
 
+	cspParts := []string{"default-src 'self'", "style-src 'self' 'unsafe-inline'"}
+	scriptSources := []string{"unpkg.com"}
+	if cfg.Plausible.ScriptUrl != "" {
+		scriptSources = append(scriptSources, cfg.Plausible.Origin)
+	}
+	cspParts = append(cspParts, "script-src "+strings.Join(scriptSources, " "))
+
 	r.Use(
 		logger.Logger("router", logrus.StandardLogger()),
 		middleware.StripSlashes,
 		sm.LoadAndSave,
-		middleware.SetHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' unpkg.com; style-src 'self' 'unsafe-inline'"),
+		middleware.SetHeader("Content-Security-Policy", strings.Join(cspParts, "; ")),
 		middleware.SetHeader("Strict-Transport-Security", "max-age=2592000"),
 		middleware.SetHeader("X-Frame-Options", "DENY"),
 		middleware.SetHeader("X-Content-Type-Options", "nosniff"),
@@ -76,7 +84,7 @@ func main() {
 func Root(w http.ResponseWriter, r *http.Request) {
 	token, ok := sm.Get(r.Context(), "token").(oauth2.Token)
 	if !ok || token.Expiry.Before(time.Now()) {
-		err := views.Root(nil, -1, nil, "").Render(w)
+		err := views.Root(cfg.Plausible, nil, -1, nil, "").Render(w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -92,7 +100,7 @@ func Root(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = views.Root(user, -1, nil, "").Render(w)
+	err = views.Root(cfg.Plausible, user, -1, nil, "").Render(w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

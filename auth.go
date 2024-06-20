@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"github.com/sirupsen/logrus"
+	"github.com/thechubbypanda/syncify/config"
 	"golang.org/x/oauth2"
 	"net/http"
 	"strings"
@@ -11,17 +12,17 @@ import (
 
 var oauthConfig oauth2.Config
 
-func SetOauthConfig(config Config) {
+func SetOauthConfig(cfg config.Config) {
 	oauthConfig = oauth2.Config{
-		ClientID:     config.ClientID,
-		ClientSecret: config.ClientSecret,
+		ClientID:     cfg.ClientID,
+		ClientSecret: cfg.ClientSecret,
 		Endpoint: oauth2.Endpoint{
 			AuthURL:       "https://accounts.spotify.com/authorize",
 			DeviceAuthURL: "",
 			TokenURL:      "https://accounts.spotify.com/api/token",
 			AuthStyle:     0,
 		},
-		RedirectURL: strings.Join([]string{config.Url, "callback"}, "/"),
+		RedirectURL: strings.Join([]string{cfg.Url, "callback"}, "/"),
 		Scopes:      []string{"playlist-read-private", "user-library-read", "playlist-modify-private", "playlist-modify-public"},
 	}
 }

@@ -5,12 +5,14 @@ import (
 	hx "github.com/maragudk/gomponents-htmx"
 	. "github.com/maragudk/gomponents/html"
 	"github.com/maragudk/gomponents/svg"
+	"github.com/thechubbypanda/syncify/config"
 	"github.com/zmb3/spotify/v2"
 	"strconv"
 )
 
-func Root(user *spotify.PrivateUser, count int, err error, playlistUrl string) g.Node {
+func Root(plausible config.Plausible, user *spotify.PrivateUser, count int, err error, playlistUrl string) g.Node {
 	return Page(
+		plausible,
 		Div(Class("flex flex-col items-center justify-center h-screen gap-6 p-8"),
 			Div(Class("flex flex-col items-center gap-2"),
 				H1(Class("text-3xl font-bold"), g.Text("Syncify")),
