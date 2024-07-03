@@ -49,7 +49,7 @@ func main() {
 
 	cspParts := []string{"default-src 'self'", "style-src 'self' 'unsafe-inline'"}
 	scriptSources := []string{"unpkg.com"}
-	connectSources := []string{"self"}
+	connectSources := []string{"'self'"}
 	if cfg.Plausible.ScriptUrl != "" {
 		scriptSources = append(scriptSources, cfg.Plausible.Origin)
 		connectSources = append(connectSources, cfg.Plausible.Origin)
