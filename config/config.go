@@ -3,10 +3,11 @@ package config
 import "github.com/sirupsen/logrus"
 
 type Config struct {
+	DataDir      string `env:"DATA_DIR" envDefault:"/data"`
 	LogLevel     logrus.Level `env:"LOG_LEVEL" envDefault:"info"`
 	ClientID     string       `env:"CLIENT_ID"`
 	ClientSecret string       `env:"CLIENT_SECRET"`
-	Url          string       `env:"URL"`
+	Url          string       `env:"URL" envDefault:"http://localhost:8000"`
 	Plausible    Plausible
 }
 

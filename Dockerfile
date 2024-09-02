@@ -14,7 +14,7 @@ COPY . .
 
 RUN npm i
 
-RUN npx tailwindcss -i stylesheet.css -o static/stylesheet.css
+RUN npm run build-prod
 
 FROM docker.io/library/alpine:latest
 
@@ -25,5 +25,7 @@ COPY static static
 COPY --from=build-go /build/out/syncify /bin/
 
 COPY --from=build-tailwind /build/static/stylesheet.css static/
+
+VOLUME [ "/data" ]
 
 CMD ["syncify"]

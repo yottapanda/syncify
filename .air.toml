@@ -1,0 +1,8 @@
+[build]
+  args_bin = []
+  bin = ";export $(grep -v '^#' .env | xargs); ./tmp/syncify" # also exports everything in .env
+  cmd = "go build -o ./tmp/syncify ."
+  delay = 100
+  exclude_dir = ["node_modules"]
+  include_ext = ["go", "css", "env"]
+  pre_cmd = ["npm run build-dev"]
