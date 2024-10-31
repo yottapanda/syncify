@@ -63,7 +63,7 @@ func main() {
 		logrus.Fatalln(err)
 	}
 
-	logrus.Traceln("created sessions index")
+	logrus.Traceln("created sessions expiry index")
 
 	logrus.Infoln("initialized database")
 
@@ -96,7 +96,7 @@ func main() {
 		middleware.SetHeader("X-Frame-Options", "DENY"),
 		middleware.SetHeader("X-Content-Type-Options", "nosniff"),
 		middleware.SetHeader("Referrer-Policy", "strict-origin"),
-		middleware.SetHeader("Permissions-Policy", "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), cross-origin-isolated=(), display-capture=(), document-domain=(), encrypted-media=(), execution-while-not-rendered=(), execution-while-out-of-viewport=(), fullscreen=(), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), navigation-override=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=()"),
+		middleware.SetHeader("Permissions-Policy", "accelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), xr-spatial-tracking=()"),
 	)
 
 	r.Route("/", func(r chi.Router) {

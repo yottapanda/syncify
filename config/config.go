@@ -3,7 +3,7 @@ package config
 import "github.com/sirupsen/logrus"
 
 type Config struct {
-	DataDir      string `env:"DATA_DIR" envDefault:"/data"`
+	DataDir      string       `env:"DATA_DIR" envDefault:"/data"` // TODO: Figure out why this defaults to ./data when .env DATA_DIR is missing
 	LogLevel     logrus.Level `env:"LOG_LEVEL" envDefault:"info"`
 	ClientID     string       `env:"CLIENT_ID"`
 	ClientSecret string       `env:"CLIENT_SECRET"`
