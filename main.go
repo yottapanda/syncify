@@ -3,11 +3,6 @@ package main
 import (
 	"database/sql"
 	"encoding/gob"
-	"net/http"
-	"path/filepath"
-	"strings"
-	"time"
-
 	"github.com/alexedwards/scs/sqlite3store"
 	"github.com/alexedwards/scs/v2"
 	"github.com/chi-middleware/logrus-logger"
@@ -20,9 +15,10 @@ import (
 	"github.com/thechubbypanda/syncify/config"
 	"github.com/thechubbypanda/syncify/model"
 	"github.com/thechubbypanda/syncify/views"
-	"github.com/zmb3/spotify/v2"
-	"github.com/zmb3/spotify/v2/auth"
 	"golang.org/x/oauth2"
+	"net/http"
+	"path/filepath"
+	"strings"
 )
 
 var cfg config.Config
@@ -38,11 +34,11 @@ func main() {
 
 	logrus.SetLevel(cfg.LogLevel)
 
+	setAuthenticator(cfg)
+
 	gob.Register(oauth2.Token{})
 
-	SetOauthConfig(cfg)
-
-	dbFilename := filepath.Join(cfg.DataDir, "syncify.db")
+	dbFilename := filepath.Join("/data", "syncify.db")
 
 	db, err := sql.Open("sqlite3", "file:"+dbFilename)
 	if err != nil {
@@ -108,25 +104,24 @@ func main() {
 		r.Get("/*", http.StripPrefix("/", http.FileServer(http.Dir("static/"))).ServeHTTP)
 	})
 
-	logrus.Infoln("starting web server on", "0.0.0.0:8000")
-	httpErr := http.ListenAndServe("0.0.0.0:8000", r)
+	logrus.Infoln("starting web server on", ":8000")
+	httpErr := http.ListenAndServe(":8000", r)
 	if httpErr != nil {
 		logrus.Errorln(httpErr)
 	}
 }
 
 func Root(w http.ResponseWriter, r *http.Request) {
-	token, ok := sm.Get(r.Context(), "token").(oauth2.Token)
-	if !ok || token.Expiry.Before(time.Now()) {
+	s, err := GetClient(r)
+	if err != nil {
+		logrus.Debugln(err)
 		err := views.Root(model.Model{Plausible: &cfg.Plausible}).Render(w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			logrus.Errorln(err)
 		}
 		return
 	}
-	s := spotify.New(spotifyauth.New().Client(r.Context(), &token))
-
 	user, err := s.CurrentUser(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -140,6 +135,7 @@ func Root(w http.ResponseWriter, r *http.Request) {
 	}).Render(w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		logrus.Errorln(err)
 		return
 	}
 }

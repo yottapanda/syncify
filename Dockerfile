@@ -22,10 +22,12 @@ WORKDIR /app
 
 COPY static static
 
-COPY --from=build-go /build/out/syncify /bin/
+COPY --from=build-go /build/out/syncify .
 
 COPY --from=build-tailwind /build/static/stylesheet.css static/
 
+EXPOSE 8000
+
 VOLUME [ "/data" ]
 
-CMD ["syncify"]
+CMD ["./syncify"]

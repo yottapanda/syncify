@@ -1,11 +1,14 @@
 services:
   syncify:
     image: ghcr.io/thechubbypanda/syncify:main
-    build: .
+    restart: unless-stopped
     user: 1000:1000 # Change to your user
     env_file:
       - .env
     volumes:
-      - ./data:/data
+      - data:/data
     ports:
       - 8000:8000
+
+volumes:
+  data:

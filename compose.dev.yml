@@ -1,0 +1,13 @@
+services:
+  syncify:
+    image: syncify:dev
+    container_name: syncify
+    network_mode: host
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - ./data:/data

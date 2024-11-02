@@ -6,10 +6,7 @@ import (
 	"github.com/thechubbypanda/syncify/model"
 	"github.com/thechubbypanda/syncify/views"
 	"github.com/zmb3/spotify/v2"
-	spotifyauth "github.com/zmb3/spotify/v2/auth"
-	"golang.org/x/oauth2"
 	"net/http"
-	"time"
 )
 
 func getLikedTrackIds(r *http.Request, s *spotify.Client) ([]spotify.ID, error) {
@@ -122,7 +119,7 @@ func truncateWrapper(r *http.Request, s *spotify.Client, user *spotify.PrivateUs
 
 type LikedTrackIdsResult struct {
 	Tracks []spotify.ID
-	Err error
+	Err    error
 }
 
 func getLikedTrackIdsWrapper(r *http.Request, s *spotify.Client, c chan LikedTrackIdsResult) {
@@ -133,9 +130,7 @@ func getLikedTrackIdsWrapper(r *http.Request, s *spotify.Client, c chan LikedTra
 	}
 }
 
-func sync(r *http.Request, token *oauth2.Token) model.SyncResponse {
-	s := spotify.New(spotifyauth.New().Client(r.Context(), token))
-
+func sync(r *http.Request, s *spotify.Client) model.SyncResponse {
 	user, err := s.CurrentUser(r.Context())
 	if err != nil {
 		logrus.Errorln("failed to fetch user: ", err)
@@ -158,13 +153,13 @@ func sync(r *http.Request, token *oauth2.Token) model.SyncResponse {
 	likedIdsChannel := make(chan LikedTrackIdsResult)
 	go getLikedTrackIdsWrapper(r, s, likedIdsChannel)
 
-	likedResult := <- likedIdsChannel
+	likedResult := <-likedIdsChannel
 	if likedResult.Err != nil {
 		logrus.Errorln(user.ID, ":", err)
 		return model.SyncResponse{Err: err}
 	}
 	trackIds := likedResult.Tracks
-	
+
 	logrus.Debugln(user.ID, ":", "found", len(trackIds), "liked songs")
 
 	if <-truncateChannel != nil {
@@ -194,19 +189,16 @@ func sync(r *http.Request, token *oauth2.Token) model.SyncResponse {
 }
 
 func Sync(w http.ResponseWriter, r *http.Request) {
-	token, ok := sm.Get(r.Context(), "token").(oauth2.Token)
-	if !ok || token.Expiry.Before(time.Now()) {
+	s, err := GetClient(r)
+	if err != nil {
+		logrus.Debugln(err)
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		logrus.Traceln("no token or expired")
 		return
 	}
 
-	syncResponse := sync(r, &token)
-	err := views.Outcome(model.Model{
-		Plausible:   nil,
-		User:        nil,
-		SyncOutcome: &syncResponse,
-	}).Render(w)
+	syncResponse := sync(r, s)
+
+	err = views.Outcome(&syncResponse).Render(w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
