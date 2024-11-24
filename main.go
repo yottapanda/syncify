@@ -1,23 +1,19 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/gob"
-	"github.com/alexedwards/scs/sqlite3store"
 	"github.com/alexedwards/scs/v2"
+	"github.com/alexedwards/scs/v2/memstore"
 	"github.com/chi-middleware/logrus-logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/ilyakaznacheev/cleanenv"
-	_ "github.com/ncruces/go-sqlite3/driver"
-	_ "github.com/ncruces/go-sqlite3/embed"
 	"github.com/sirupsen/logrus"
 	"github.com/thechubbypanda/syncify/config"
 	"github.com/thechubbypanda/syncify/model"
 	"github.com/thechubbypanda/syncify/views"
 	"golang.org/x/oauth2"
 	"net/http"
-	"path/filepath"
 	"strings"
 )
 
@@ -38,32 +34,7 @@ func main() {
 
 	gob.Register(oauth2.Token{})
 
-	dbFilename := filepath.Join("/data", "syncify.db")
-
-	db, err := sql.Open("sqlite3", "file:"+dbFilename)
-	if err != nil {
-		logrus.Fatalln(err)
-	}
-
-	logrus.Traceln("opened database file: " + dbFilename)
-
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, data BLOB NOT NULL, expiry REAL NOT NULL);")
-	if err != nil {
-		logrus.Fatalln(err)
-	}
-
-	logrus.Traceln("sessions db created")
-
-	_, err = db.Exec("CREATE INDEX IF NOT EXISTS sessions_expiry_idx ON sessions(expiry);")
-	if err != nil {
-		logrus.Fatalln(err)
-	}
-
-	logrus.Traceln("created sessions expiry index")
-
-	logrus.Infoln("initialized database")
-
-	sm.Store = sqlite3store.New(db)
+	sm.Store = memstore.New()
 
 	sm.Cookie.Secure = strings.HasPrefix(cfg.Url, "https")
 	sm.Cookie.HttpOnly = true
@@ -84,8 +55,9 @@ func main() {
 	cspParts = append(cspParts, "connect-src "+strings.Join(connectSources, " "))
 
 	r.Use(
-		logger.Logger("router", logrus.StandardLogger()),
+		middleware.RealIP,
 		middleware.StripSlashes,
+		logger.Logger("router", logrus.StandardLogger()),
 		sm.LoadAndSave,
 		middleware.SetHeader("Content-Security-Policy", strings.Join(cspParts, "; ")),
 		middleware.SetHeader("Strict-Transport-Security", "max-age=2592000"),

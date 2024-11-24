@@ -1,10 +1,10 @@
 package views
 
 import (
-	g "github.com/maragudk/gomponents"
-	c "github.com/maragudk/gomponents/components"
-	. "github.com/maragudk/gomponents/html"
 	"github.com/thechubbypanda/syncify/model"
+	g "maragu.dev/gomponents"
+	c "maragu.dev/gomponents/components"
+	. "maragu.dev/gomponents/html"
 )
 
 func Page(model model.Model, contents ...g.Node) g.Node {

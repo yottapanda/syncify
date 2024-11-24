@@ -28,6 +28,4 @@ COPY --from=build-tailwind /build/static/stylesheet.css static/
 
 EXPOSE 8000
 
-VOLUME [ "/data" ]
-
 CMD ["./syncify"]
