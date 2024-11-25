@@ -73,7 +73,9 @@ func main() {
 		r.Get("/login", Login)
 		r.Get("/logout", Logout)
 		r.Get("/callback", Callback)
-		r.Get("/*", http.StripPrefix("/", http.FileServer(http.Dir("static/"))).ServeHTTP)
+		r.Route("/", func(r chi.Router) {
+			r.Get("/*", http.StripPrefix("/", http.FileServer(http.Dir("static/"))).ServeHTTP)
+		})
 	})
 
 	logrus.Infoln("starting web server on", ":8000")
