@@ -1,6 +1,0 @@
-[build]
-  args_bin = []
-  delay = 100
-  exclude_dir = ["node_modules", "data"]
-  include_ext = ["go", "css", "env"]
-  pre_cmd = ["npm run build-dev"]

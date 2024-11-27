@@ -6,9 +6,7 @@ For some reason doing this has always been impossible; it has bugged me for year
 
 ## Usage
 
-(Until Spotify approves the app, you won't be able to use the tool unless I add you to the tester's list)
-
-1. Go to [syncify.thechubbypanda.dev](https://syncify.thechubbypanda.dev)
+1. Go to [https://syncify.thechubbypanda.dev](https://syncify.thechubbypanda.dev)
 2. Press "Login with Spotify"
 3. When prompted, allow access
 4. Press the "Sync" button
@@ -25,41 +23,27 @@ Syncify is primarily written in Golang using:
 - [Chi Router](https://go-chi.io/#/)
 - [Tailwind CSS](https://tailwindcss.com/)
 
-This was my first time using Tailwind CSS and I must say, alongside Gomponents, it has made me reconsider my dislike of frontend development!
+## Self-Hosting
 
-## Running Locally
+See the [examples directory](examples) for a docker-compose file that you can use to self-host Syncify.
 
-### Spotify App
+Use the [example .env file](example.env) as a template for your own `.env` file.
 
-You'll need your own Spotify app in their [developer console](https://developer.spotify.com/dashboard). From there you can grab an OAuth2 Client ID and Client Secret to users to log in.
+## Development
 
-Then you fill them into a `.env` file in the root of the repo, see the [example .env file](example.env).
+Populate a `/.env` file with your own Spotify app's Client ID and Client Secret, see the [example .env file](example.env). It should look something like this:
 
-### Option 1: Docker Compose
-
-The quickest option to get up and running is by executing the following commands after cloning the repo:
-
-```shell
-docker-compose build
-docker-compose up -d
+```env
+LOG_LEVEL=trace
+CLIENT_ID=thisisdefinitelyasecret
+CLIENT_SECRET=thisisdefinitelyasecret
+URL=http://localhost:8000
 ```
 
-### Option 2: Manual
+Then you just need to run the following command:
 
-1. Build the Tailwind CSS:
+```shell
+docker compose up --build --watch
+```
 
-    ```shell
-    npm i && npm run build
-    ```
-
-2. Export the variables in [example.env](example.env) e.g.
-
-    ```shell
-    export CLIENT_SECRET=thisisdefinitelyasecret
-    ```
-
-3. Start the server
-
-    ```shell
-    go run .
-    ```
+If you're using GoLand, you'll need to `Crtl+S` to get IntelliJ to write out the files that you've changed or just swap to your browser and wait a second or two for compose to do it's magic.

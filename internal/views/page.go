@@ -1,7 +1,7 @@
 package views
 
 import (
-	"github.com/thechubbypanda/syncify/model"
+	"github.com/thechubbypanda/syncify/internal/model"
 	g "maragu.dev/gomponents"
 	c "maragu.dev/gomponents/components"
 	. "maragu.dev/gomponents/html"

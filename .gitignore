@@ -1,6 +1,4 @@
 .idea/
-.env
 node_modules/
-data/
 static/stylesheet.css
-tmp/
+.env

@@ -1,0 +1,9 @@
+services:
+  syncify:
+    image: ghcr.io/thechubbypanda/syncify:main
+    restart: unless-stopped
+    user: 1000:1000 # Change to your user id (find using `id -u` and `id -g`)
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"

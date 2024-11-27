@@ -1,47 +1,17 @@
-package main
+package routes
 
 import (
-	"encoding/gob"
-	"github.com/alexedwards/scs/v2"
-	"github.com/alexedwards/scs/v2/memstore"
-	"github.com/chi-middleware/logrus-logger"
+	logger "github.com/chi-middleware/logrus-logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/sirupsen/logrus"
-	"github.com/thechubbypanda/syncify/config"
-	"github.com/thechubbypanda/syncify/model"
-	"github.com/thechubbypanda/syncify/views"
-	"golang.org/x/oauth2"
+	"github.com/thechubbypanda/syncify/internal/config"
+	"github.com/thechubbypanda/syncify/internal/session"
 	"net/http"
 	"strings"
 )
 
-var cfg config.Config
-
-var sm = scs.New()
-
-func main() {
-	err := cleanenv.ReadEnv(&cfg)
-	if err != nil {
-		logrus.Fatalln("error reading cfg: ", err)
-		return
-	}
-
-	logrus.SetLevel(cfg.LogLevel)
-
-	setAuthenticator(cfg)
-
-	gob.Register(oauth2.Token{})
-
-	sm.Store = memstore.New()
-
-	sm.Cookie.Secure = strings.HasPrefix(cfg.Url, "https")
-	sm.Cookie.HttpOnly = true
-	sm.Cookie.Persist = false
-	sm.Cookie.Name = "syncify_session"
-	sm.Cookie.SameSite = http.SameSiteLaxMode
-
+func CreateRouter(cfg *config.Config) *chi.Mux {
 	r := chi.NewRouter()
 
 	cspParts := []string{"default-src 'self'", "style-src 'self' 'unsafe-inline'"}
@@ -58,7 +28,7 @@ func main() {
 		middleware.RealIP,
 		middleware.StripSlashes,
 		logger.Logger("router", logrus.StandardLogger()),
-		sm.LoadAndSave,
+		session.Manager.LoadAndSave,
 		middleware.SetHeader("Content-Security-Policy", strings.Join(cspParts, "; ")),
 		middleware.SetHeader("Strict-Transport-Security", "max-age=2592000"),
 		middleware.SetHeader("X-Frame-Options", "DENY"),
@@ -78,38 +48,5 @@ func main() {
 		})
 	})
 
-	logrus.Infoln("starting web server on", ":8000")
-	httpErr := http.ListenAndServe(":8000", r)
-	if httpErr != nil {
-		logrus.Errorln(httpErr)
-	}
-}
-
-func Root(w http.ResponseWriter, r *http.Request) {
-	s, err := GetClient(r)
-	if err != nil {
-		logrus.Debugln(err)
-		err := views.Root(model.Model{Plausible: &cfg.Plausible}).Render(w)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			logrus.Errorln(err)
-		}
-		return
-	}
-	user, err := s.CurrentUser(r.Context())
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logrus.Errorln(err)
-		return
-	}
-
-	err = views.Root(model.Model{
-		Plausible: &cfg.Plausible,
-		User:      user,
-	}).Render(w)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logrus.Errorln(err)
-		return
-	}
+	return r
 }

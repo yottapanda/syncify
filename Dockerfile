@@ -4,7 +4,7 @@ WORKDIR /build
 
 COPY . .
 
-RUN go build -o out/syncify .
+RUN go build -o out/syncify cmd/main/main.go
 
 FROM docker.io/library/node:alpine AS build-tailwind
 

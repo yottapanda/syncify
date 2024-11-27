@@ -1,6 +1,9 @@
 package config
 
-import "github.com/sirupsen/logrus"
+import (
+	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/sirupsen/logrus"
+)
 
 type Config struct {
 	LogLevel  logrus.Level `env:"LOG_LEVEL" envDefault:"info"`
@@ -13,4 +16,14 @@ type Plausible struct {
 	DataDomain string `env:"PLAUSIBLE_DATA_DOMAIN"`
 	DataApi    string `env:"PLAUSIBLE_DATA_API"`
 	Origin     string `env:"PLAUSIBLE_ORIGIN"`
+}
+
+var Cfg Config
+
+func LoadConfig() {
+	err := cleanenv.ReadEnv(&Cfg)
+	if err != nil {
+		logrus.Fatalln("error reading cfg: ", err)
+		return
+	}
 }

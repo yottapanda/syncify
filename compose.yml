@@ -1,10 +1,34 @@
 services:
   syncify:
-    image: ghcr.io/thechubbypanda/syncify:main
-    build: .
-    restart: unless-stopped
-    user: 1000:1000 # Change to your user
+    image: github.com/thechubbypanda/syncify:dev
+    container_name: syncify
+    network_mode: host
     env_file:
       - .env
-    ports:
-      - 8000:8000
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./cmd
+          target: /app/cmd
+        - action: sync+restart
+          path: ./internal
+          target: /app/internal
+        - action: sync+restart
+          path: ./static
+          target: /app/static
+        - action: sync+restart
+          path: ./go.mod
+          target: /app/go.mod
+        - action: sync+restart
+          path: ./go.sum
+          target: /app/go.sum
+        - action: sync+restart
+          path: ./stylesheet.css
+          target: /app/stylesheet.css
+        - action: rebuild
+          path: ./Dockerfile
+          target: /app/Dockerfile
+
