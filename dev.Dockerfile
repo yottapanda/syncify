@@ -8,4 +8,4 @@ COPY . .
 
 RUN npm i
 
-CMD ["sh", "-c", "npx tailwindcss -i stylesheet.css -o static/stylesheet.css && go run cmd/main/main.go"]
+CMD ["sh", "-c", "npx @tailwindcss/cli -i tailwind.css -o static/stylesheet.css && go run cmd/main/main.go"]
