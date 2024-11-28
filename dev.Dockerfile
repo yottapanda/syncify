@@ -8,6 +8,4 @@ COPY . .
 
 RUN npm i
 
-EXPOSE 8000
-
 CMD ["sh", "-c", "npx tailwindcss -i stylesheet.css -o static/stylesheet.css && go run cmd/main/main.go"]

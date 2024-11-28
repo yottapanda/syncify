@@ -112,21 +112,8 @@ func truncatePlaylist(c context.Context, s *spotify.Client, user *spotify.Privat
 	return nil
 }
 
-func truncateWrapper(c context.Context, s *spotify.Client, user *spotify.PrivateUser, playlist *spotify.SimplePlaylist, ch chan error) {
+func truncateAsync(c context.Context, s *spotify.Client, user *spotify.PrivateUser, playlist *spotify.SimplePlaylist, ch chan error) {
 	ch <- truncatePlaylist(c, s, user, playlist)
-}
-
-type LikedTrackIdsResult struct {
-	Tracks []spotify.ID
-	Err    error
-}
-
-func getLikedTrackIdsWrapper(c context.Context, s *spotify.Client, ch chan LikedTrackIdsResult) {
-	tracks, err := getLikedTrackIds(c, s)
-	ch <- LikedTrackIdsResult{
-		tracks,
-		err,
-	}
 }
 
 func Sync(c context.Context, s *spotify.Client) model.SyncResponse {
@@ -147,17 +134,13 @@ func Sync(c context.Context, s *spotify.Client) model.SyncResponse {
 	logrus.Debugln(user.ID, ":", "using playlist", playlist.ID)
 
 	truncateChannel := make(chan error)
-	go truncateWrapper(c, s, user, playlist, truncateChannel)
+	go truncateAsync(c, s, user, playlist, truncateChannel)
 
-	likedIdsChannel := make(chan LikedTrackIdsResult)
-	go getLikedTrackIdsWrapper(c, s, likedIdsChannel)
-
-	likedResult := <-likedIdsChannel
-	if likedResult.Err != nil {
+	trackIds, err := getLikedTrackIds(c, s)
+	if err != nil {
 		logrus.Errorln(user.ID, ":", err)
 		return model.SyncResponse{Err: err}
 	}
-	trackIds := likedResult.Tracks
 
 	logrus.Debugln(user.ID, ":", "found", len(trackIds), "liked songs")
 
