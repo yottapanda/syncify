@@ -2,7 +2,9 @@ package config
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
+	"os"
 )
 
 type Config struct {
@@ -21,6 +23,15 @@ type Plausible struct {
 var Cfg Config
 
 func LoadConfig() {
+	if _, err := os.Stat(".env"); err != nil {
+		logrus.Infoln("skipped loading .env file:", err)
+	} else {
+		if err := godotenv.Load(); err != nil {
+			logrus.Fatalln("error loading .env file: ", err)
+			return
+		}
+	}
+
 	err := cleanenv.ReadEnv(&Cfg)
 	if err != nil {
 		logrus.Fatalln("error reading cfg: ", err)

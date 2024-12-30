@@ -5,8 +5,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/sirupsen/logrus"
+	"github.com/thechubbypanda/syncify"
 	"github.com/thechubbypanda/syncify/internal/config"
 	"github.com/thechubbypanda/syncify/internal/session"
+	"io/fs"
 	"net/http"
 	"strings"
 )
@@ -43,9 +45,11 @@ func CreateRouter(cfg *config.Config) *chi.Mux {
 		r.Get("/login", Login)
 		r.Get("/logout", Logout)
 		r.Get("/callback", Callback)
-		r.Route("/", func(r chi.Router) {
-			r.Get("/*", http.StripPrefix("/", http.FileServer(http.Dir("static/"))).ServeHTTP)
-		})
+		fSys, err := fs.Sub(syncify.Static, "static")
+		if err != nil {
+			logrus.WithError(err).Fatalln("error loading embeded files")
+		}
+		r.Get("/*", http.StripPrefix("/", http.FileServer(http.FS(fSys))).ServeHTTP)
 	})
 
 	return r

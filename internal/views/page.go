@@ -12,8 +12,9 @@ func Page(model model.Model, contents ...g.Node) g.Node {
 		Meta(Name("description"), Content("Sync your Spotify 'Liked Songs' playlist to a sharable one.")),
 		Meta(Name("keywords"), Content("spotify, sync, likes, liked, songs, public, playlist")),
 		Meta(Name("author"), Content("Keval \"thechubbypanda\" Kapdee")),
+		Link(Rel("icon"), Href("/icon.png"), Type("image/svg+xml")),
 		Script(Src("https://unpkg.com/htmx.org@1.9.12"), Async(), Integrity("sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2"), CrossOrigin("anonymous")),
-		Link(Rel("stylesheet"), Href("/stylesheet.css")),
+		Link(Rel("stylesheet"), Href("/stylesheet.css"), Type("text/css")),
 	}
 	if model.Plausible.ScriptUrl != "" {
 		head = append(head, Script(
