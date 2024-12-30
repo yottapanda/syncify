@@ -4,9 +4,11 @@ WORKDIR /build
 
 COPY . .
 
-RUN npm i
+RUN corepack enable pnpm
 
-RUN npm run build-prod
+RUN pnpm i
+
+RUN pnpx tailwindcss -i tailwind.css -o static/stylesheet.css -m
 
 FROM docker.io/library/golang:alpine AS build-go
 

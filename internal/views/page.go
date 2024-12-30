@@ -13,7 +13,7 @@ func Page(model model.Model, contents ...g.Node) g.Node {
 		Meta(Name("keywords"), Content("spotify, sync, likes, liked, songs, public, playlist")),
 		Meta(Name("author"), Content("Keval \"thechubbypanda\" Kapdee")),
 		Link(Rel("icon"), Href("/icon.png"), Type("image/svg+xml")),
-		Script(Src("https://unpkg.com/htmx.org@1.9.12"), Async(), Integrity("sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2"), CrossOrigin("anonymous")),
+		Script(Src("/vendor/htmx.2.0.4.min.js")),
 		Link(Rel("stylesheet"), Href("/stylesheet.css"), Type("text/css")),
 	}
 	if model.Plausible.ScriptUrl != "" {

@@ -17,7 +17,7 @@ func CreateRouter(cfg *config.Config) *chi.Mux {
 	r := chi.NewRouter()
 
 	cspParts := []string{"default-src 'self'", "style-src 'self' 'unsafe-inline'"}
-	scriptSources := []string{"unpkg.com"}
+	scriptSources := []string{"'self'"}
 	connectSources := []string{"'self'"}
 	if cfg.Plausible.ScriptUrl != "" {
 		scriptSources = append(scriptSources, cfg.Plausible.Origin)
