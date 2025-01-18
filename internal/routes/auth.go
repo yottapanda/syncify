@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/thechubbypanda/syncify/internal/auth"
-	"github.com/thechubbypanda/syncify/internal/session"
+	"github.com/yottapanda/syncify/internal/auth"
+	"github.com/yottapanda/syncify/internal/session"
 	"net/http"
 )
 

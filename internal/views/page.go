@@ -1,7 +1,7 @@
 package views
 
 import (
-	"github.com/thechubbypanda/syncify/internal/model"
+	"github.com/yottapanda/syncify/internal/model"
 	g "maragu.dev/gomponents"
 	c "maragu.dev/gomponents/components"
 	. "maragu.dev/gomponents/html"
@@ -11,7 +11,7 @@ func Page(model model.Model, contents ...g.Node) g.Node {
 	head := []g.Node{
 		Meta(Name("description"), Content("Sync your Spotify 'Liked Songs' playlist to a sharable one.")),
 		Meta(Name("keywords"), Content("spotify, sync, likes, liked, songs, public, playlist")),
-		Meta(Name("author"), Content("Keval \"thechubbypanda\" Kapdee")),
+		Meta(Name("author"), Content("Keval \"yottapanda\" Kapdee")),
 		Link(Rel("icon"), Href("/icon.png"), Type("image/svg+xml")),
 		Script(Src("/vendor/htmx.2.0.4.min.js")),
 		Link(Rel("stylesheet"), Href("/stylesheet.css"), Type("text/css")),

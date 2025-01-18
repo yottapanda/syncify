@@ -3,10 +3,10 @@ package main
 import (
 	"encoding/gob"
 	"github.com/sirupsen/logrus"
-	"github.com/thechubbypanda/syncify/internal/auth"
-	"github.com/thechubbypanda/syncify/internal/config"
-	"github.com/thechubbypanda/syncify/internal/routes"
-	"github.com/thechubbypanda/syncify/internal/session"
+	"github.com/yottapanda/syncify/internal/auth"
+	"github.com/yottapanda/syncify/internal/config"
+	"github.com/yottapanda/syncify/internal/routes"
+	"github.com/yottapanda/syncify/internal/session"
 	"golang.org/x/oauth2"
 	"net/http"
 )

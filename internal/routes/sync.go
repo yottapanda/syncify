@@ -2,9 +2,9 @@ package routes
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/thechubbypanda/syncify/internal/auth"
-	"github.com/thechubbypanda/syncify/internal/sync"
-	"github.com/thechubbypanda/syncify/internal/views"
+	"github.com/yottapanda/syncify/internal/auth"
+	"github.com/yottapanda/syncify/internal/sync"
+	"github.com/yottapanda/syncify/internal/views"
 	"net/http"
 )
 

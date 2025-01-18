@@ -1,4 +1,4 @@
-module github.com/thechubbypanda/syncify
+module github.com/yottapanda/syncify
 
 go 1.23.3
 

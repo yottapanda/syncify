@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/thechubbypanda/syncify/internal/config"
+	"github.com/yottapanda/syncify/internal/config"
 	"github.com/zmb3/spotify/v2/auth"
 )
 

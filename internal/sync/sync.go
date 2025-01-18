@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/sirupsen/logrus"
-	"github.com/thechubbypanda/syncify/internal/model"
+	"github.com/yottapanda/syncify/internal/model"
 	"github.com/zmb3/spotify/v2"
 )
 

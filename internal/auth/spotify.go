@@ -2,7 +2,7 @@ package auth
 
 import (
 	"errors"
-	"github.com/thechubbypanda/syncify/internal/session"
+	"github.com/yottapanda/syncify/internal/session"
 	"github.com/zmb3/spotify/v2"
 	"golang.org/x/oauth2"
 	"net/http"

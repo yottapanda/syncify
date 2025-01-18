@@ -3,7 +3,7 @@ package session
 import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/alexedwards/scs/v2/memstore"
-	"github.com/thechubbypanda/syncify/internal/config"
+	"github.com/yottapanda/syncify/internal/config"
 	"net/http"
 	"strings"
 )

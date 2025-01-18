@@ -6,7 +6,7 @@ For some reason doing this has always been impossible; it has bugged me for year
 
 ## Usage
 
-1. Go to [https://syncify.thechubbypanda.dev](https://syncify.thechubbypanda.dev)
+1. Go to [https://syncify.yottapanda.com](https://syncify.yottapanda.com)
 2. Press "Login with Spotify"
 3. When prompted, allow access
 4. Press the "Sync" button

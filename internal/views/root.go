@@ -1,7 +1,7 @@
 package views
 
 import (
-	"github.com/thechubbypanda/syncify/internal/model"
+	"github.com/yottapanda/syncify/internal/model"
 	g "maragu.dev/gomponents"
 	hx "maragu.dev/gomponents-htmx"
 	. "maragu.dev/gomponents/html"
@@ -25,9 +25,9 @@ func Root(model model.Model) g.Node {
 			Outcome(model.SyncOutcome),
 			P(
 				Class("absolute bottom-0 p-4 text-center"),
-				A(Class("text-green-500"), Href("https://github.com/thechubbypanda/syncify"), g.Text("Syncify")),
+				A(Class("text-green-500"), Href("https://github.com/yottapanda/syncify"), g.Text("Syncify")),
 				g.Text(" is made with love by "),
-				A(Class("text-green-500"), Href("https://github.com/thechubbypanda"), g.Text("thechubbypanda")),
+				A(Class("text-green-500"), Href("https://github.com/yottapanda"), g.Text("yottapanda")),
 			),
 		),
 	)
