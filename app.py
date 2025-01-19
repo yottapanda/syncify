@@ -41,7 +41,14 @@ def logout():
 @app.route("/")
 def home():
     if 'token' not in session:
-        return redirect('/auth/login')
+        return f"""<html>
+        <body>
+            <h1>Syncify 2!</h1>
+            <p>You are not currently logged in</p>
+            <a href="/auth/login">Login</a>
+        </body>
+        </html>
+        """
     spotify = spotipy.Spotify(auth=session['token'])
     user = spotify.current_user()
     return f"""<html>
@@ -53,6 +60,6 @@ def home():
     </body>
     </html>"""
 
-@app.route("/sync", methods=["POST"])
+@app.route("/sync")
 def sync():
     return "Syncing... not implemented yet"
