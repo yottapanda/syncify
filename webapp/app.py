@@ -66,4 +66,20 @@ def home():
 
 @app.route("/sync")
 def sync():
-    return "Syncing... not implemented yet"
+    spotify = spotipy.Spotify(auth=session['token'])
+    results = spotify.current_user_saved_tracks(limit=50, offset=0)
+
+    trackIds = []
+
+    for track in results['items']:
+        trackIds.append(track['track']['id'])
+
+    while results['next']:
+        results = spotify.next(results)
+        for track in results['items']:
+            trackIds.append(track['track']['id'])
+    
+    return trackIds
+
+def prod(environ, start_response):
+    return app(environ, start_response)
