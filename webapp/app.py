@@ -40,6 +40,14 @@ def logout():
 
 @app.route("/")
 def home():
+    spotify = spotipy.Spotify(auth=session['token'])
+    user = {
+        "display_name": "Error",
+    }
+    try:
+        user = spotify.current_user()
+    except Exception as e:
+        session.clear()
     if 'token' not in session:
         return f"""<html>
         <body>
@@ -49,8 +57,6 @@ def home():
         </body>
         </html>
         """
-    spotify = spotipy.Spotify(auth=session['token'])
-    user = spotify.current_user()
     return f"""<html>
     <body>
     <h1>Syncify 2!</h1>
