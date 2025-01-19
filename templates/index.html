@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flask with Tailwind</title>
+    <link
+      href="{{ url_for('static', filename='style.css') }}"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100 p-8">
+    <h1 class="text-4xl text-center text-blue-500">
+      Syncify
+    </h1>
+
+    <br><a href="/sync">Sync</a>
+    <br><a href="/logout">Logout</a>
+
+    </div>
+  </body>
+</html>

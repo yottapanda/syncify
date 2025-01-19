@@ -2,14 +2,12 @@
   "name": "syncify2",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
+  "scripts": {
+    "build": "npx tailwindcss -i style.css -o ./static/style.css"
+  },
+  "devDependencies": {
     "tailwindcss": "^3.4.17"
   }
 }

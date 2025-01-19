@@ -1,0 +1,22 @@
+
+:root {
+    --primary-bg-color: #1a2e05; /* Light gray background */
+    --primary-text-color: #1a2e05; /* Dark gray text */
+}
+
+body {
+    background-color: var(--primary-bg-color);
+    color: var(--primary-text-color);
+    font-family: Arial, sans-serif;
+}
+
+.centered-80 {
+    top: 20%;
+    width: 80%;            /* Set width to 80% */
+    margin: 0 auto;        /* Center horizontally */
+    padding: 1.5rem;       /* Add padding (equivalent to Tailwind's p-6) */
+    background-color: #fff; /* White background */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Shadow (similar to shadow-lg) */
+    border-radius: 0.5rem; /* Rounded corners (similar to rounded-lg) */
+    text-align: center;    /* Center text */
+}

@@ -4,12 +4,12 @@ import time
 
 import spotipy
 from dotenv import load_dotenv
-from flask import Flask, redirect, request, session, g
+from flask import Flask, redirect, render_template, request, session, g
 from flask_session import Session
 
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates", static_folder="../static")
 
 Session(app)
 
@@ -74,14 +74,7 @@ def logout():
 @app.route("/")
 def home():
     if 'id' not in session:
-        return f"""<html>
-                <body>
-                    <h1>Syncify 2!</h1>
-                    <p>You are not currently logged in</p>
-                    <a href="/auth/login">Login</a>
-                </body>
-                </html>
-                """
+        return render_template("login.html")
 
     with get_db() as db:
         user = db.execute("SELECT access_token, access_token_expiry, refresh_token FROM users WHERE id = ?", (session['id'],)).fetchone()
@@ -116,14 +109,7 @@ def home():
         print(e)
         session.clear()
         return redirect('/')
-    return f"""<html>
-    <body>
-    <h1>Syncify 2!</h1>
-    <p>Logged in as {user['display_name']}</p>
-    <a href="/sync">Sync</a>
-    <a href="/logout">Logout</a>
-    </body>
-    </html>"""
+    return render_template("index.html")
 
 
 def get_liked_track_uris(spotify):
