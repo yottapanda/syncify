@@ -11,6 +11,7 @@ import (
 	"io/fs"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func CreateRouter(cfg *config.Config) *chi.Mux {
@@ -41,7 +42,7 @@ func CreateRouter(cfg *config.Config) *chi.Mux {
 
 	r.Route("/", func(r chi.Router) {
 		r.Get("/", Root)
-		r.Get("/sync", Sync)
+		r.With(TimeoutMiddleware(5*time.Minute)).Get("/sync", Sync)
 		r.Get("/login", Login)
 		r.Get("/logout", Logout)
 		r.Get("/callback", Callback)

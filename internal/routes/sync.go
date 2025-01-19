@@ -1,12 +1,30 @@
 package routes
 
 import (
+	"context"
 	"github.com/sirupsen/logrus"
 	"github.com/yottapanda/syncify/internal/auth"
 	"github.com/yottapanda/syncify/internal/sync"
 	"github.com/yottapanda/syncify/internal/views"
 	"net/http"
+	"time"
 )
+
+func TimeoutMiddleware(timeout time.Duration) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx, cancel := context.WithTimeout(r.Context(), timeout)
+			defer cancel()
+
+			next.ServeHTTP(w, r.WithContext(ctx))
+
+			deadline, ok := ctx.Deadline()
+			if !ok || time.Now().Before(deadline) {
+				logrus.Errorln("Request timed out")
+			}
+		})
+	}
+}
 
 func Sync(w http.ResponseWriter, r *http.Request) {
 	s, err := auth.GetClient(r)
