@@ -1,10 +1,11 @@
 /.idea/
 /build/
 /*.egg-info/
-/__pycache__/
+__pycache__/
 /node_modules/
-/.env
 /.venv/
+/data/
+/.env
 
 /.git/
 /.gitignore
