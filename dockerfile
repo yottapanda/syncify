@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD [ "sh", "-c", "python3 -m gunicorn -w 4 webapp.app:prod --bind 0.0.0.0:5000" ]
+CMD [ "sh", "-c", "python3 -m gunicorn -w 4 webapp.app:app --bind 0.0.0.0:5000" ]

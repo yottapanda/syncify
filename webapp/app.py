@@ -67,6 +67,3 @@ def home():
 @app.route("/sync")
 def sync():
     return "Syncing... not implemented yet"
-
-def prod(environ, start_response):
-    return app(environ, start_response)

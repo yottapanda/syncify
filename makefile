@@ -7,10 +7,10 @@ dev:
 
 # Production commands
 
-prod: build run
+prod: kill build run
 build:
 	docker build -t syncify2 .
 run:
 	docker run --rm -d -p 5000:5000 --env-file .env --name syncify2 syncify2
 kill:
-	docker kill syncify2
+	docker kill syncify2 || true
