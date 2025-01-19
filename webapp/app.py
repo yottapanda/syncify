@@ -6,29 +6,27 @@ from flask import Flask, redirect, request, session
 from dotenv import load_dotenv
 from flask_session import Session
 
-load_dotenv()
-
 app = Flask(__name__)
-
-app.secret_key = os.environ.get("SECRET_KEY")
 
 Session(app)
 
+load_dotenv()
+
+app.secret_key = os.environ["SECRET_KEY"]
+
 scope = "playlist-read-private,playlist-modify-private,user-library-read,playlist-modify-public"
+
+cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
+auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler, scope=scope)
 
 @app.route("/auth/login")
 def login():
-    cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
-    auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
     auth_url = auth_manager.get_authorize_url()
 
     return redirect(auth_url)
 
 @app.route("/auth/callback")
 def callback():
-    cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
-    auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
-
     session['token'] = auth_manager.get_access_token(request.args.get('code'))['access_token']
 
     return redirect('/')
@@ -40,11 +38,11 @@ def logout():
 
 @app.route("/")
 def home():
-    spotify = spotipy.Spotify(auth=session['token'])
     user = {
         "display_name": "Error",
     }
     try:
+        spotify = spotipy.Spotify(auth=session['token'])
         user = spotify.current_user()
     except Exception as e:
         session.clear()
@@ -69,3 +67,6 @@ def home():
 @app.route("/sync")
 def sync():
     return "Syncing... not implemented yet"
+
+def prod(environ, start_response):
+    return app(environ, start_response)
