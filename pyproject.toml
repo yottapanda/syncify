@@ -2,4 +2,4 @@
 name = "syncify2"
 version = "0.0.0"
 requires-python = ">= 3.13"
-dependencies = ["flask"]
+dependencies = ["flask", "spotipy", "flask_session2", "python-dotenv"]
