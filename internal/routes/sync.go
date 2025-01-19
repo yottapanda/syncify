@@ -10,22 +10,6 @@ import (
 	"time"
 )
 
-func TimeoutMiddleware(timeout time.Duration) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx, cancel := context.WithTimeout(r.Context(), timeout)
-			defer cancel()
-
-			next.ServeHTTP(w, r.WithContext(ctx))
-
-			deadline, ok := ctx.Deadline()
-			if !ok || time.Now().Before(deadline) {
-				logrus.Errorln("Request timed out")
-			}
-		})
-	}
-}
-
 func Sync(w http.ResponseWriter, r *http.Request) {
 	s, err := auth.GetClient(r)
 	if err != nil {
@@ -33,6 +17,11 @@ func Sync(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
 	}
+
+	// Custom long context timeout
+	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Minute)
+	defer cancel()
+	r = r.WithContext(ctx)
 
 	syncResponse := sync.Sync(r.Context(), s)
 

@@ -11,7 +11,6 @@ import (
 	"io/fs"
 	"net/http"
 	"strings"
-	"time"
 )
 
 func CreateRouter(cfg *config.Config) *chi.Mux {
@@ -19,7 +18,7 @@ func CreateRouter(cfg *config.Config) *chi.Mux {
 
 	cspParts := []string{"default-src 'self'", "style-src 'self' 'unsafe-inline'"}
 	scriptSources := []string{"'self'"}
-	connectSources := []string{"'self'"}
+	connectSources := []string{"'self' accounts.spotify.com"}
 	if cfg.Plausible.ScriptUrl != "" {
 		scriptSources = append(scriptSources, cfg.Plausible.Origin)
 		connectSources = append(connectSources, cfg.Plausible.Origin)
@@ -42,7 +41,7 @@ func CreateRouter(cfg *config.Config) *chi.Mux {
 
 	r.Route("/", func(r chi.Router) {
 		r.Get("/", Root)
-		r.With(TimeoutMiddleware(5*time.Minute)).Get("/sync", Sync)
+		r.Get("/sync", Sync)
 		r.Get("/login", Login)
 		r.Get("/logout", Logout)
 		r.Get("/callback", Callback)
