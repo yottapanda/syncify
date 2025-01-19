@@ -24,6 +24,8 @@ def get_db():
                 detect_types=sqlite3.PARSE_DECLTYPES
             )
             g.db.row_factory = sqlite3.Row
+            with g.db as db:
+                db.executescript(open('schema.sql').read())
         return g.db
 
 
