@@ -1,2 +1,5 @@
-CREATE TABLE IF NOT EXISTS users (id STRING PRIMARY KEY, access_token STRING, access_token_expiry INT, refresh_token STRING);
+CREATE TABLE IF NOT EXISTS users (id STRING PRIMARY KEY, access_token STRING NOT NULL, access_token_expiry INTEGER NOT NULL, refresh_token STRING NOT NULL);
 CREATE INDEX IF NOT EXISTS users_id ON users (id);
+CREATE TABLE IF NOT EXISTS sync_requests (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id STRING NOT NULL, done INTEGER DEFAULT FALSE NOT NULL, created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL);
+CREATE INDEX IF NOT EXISTS sync_requests_id ON sync_requests (id);
+CREATE INDEX IF NOT EXISTS sync_requests_done ON sync_requests (done);
