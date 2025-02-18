@@ -1,5 +1,8 @@
 .PHONY: dev build prod
 
+deps:
+	pip install .
+
 # Development commands
 
 dev:
