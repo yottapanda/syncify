@@ -28,4 +28,4 @@ ENV DB_FILE=/data/db.sqlite
 
 EXPOSE 5000
 
-CMD [ "sh", "-c", "python3 -m webapp.app" ]
+CMD [ "sh", "-c", "python3 -m src.webapp.app" ]

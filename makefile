@@ -6,10 +6,10 @@ deps:
 # Development commands
 
 dev:
-	python -m webapp.app
+	python -m src.webapp.app
 
 worker:
-	python -m worker.main
+	python -m src.worker.main
 
 
 # Production commands
