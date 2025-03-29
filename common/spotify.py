@@ -1,4 +1,5 @@
 import spotipy
+from spotipy import Spotify
 
 
 def gen_auth_manager(cache_handler=None):
@@ -7,7 +8,7 @@ def gen_auth_manager(cache_handler=None):
         cache_handler=cache_handler,
         scope=scope)
 
-def get_liked_track_uris(spotify):
+def get_liked_track_uris(spotify: Spotify):
     results = spotify.current_user_saved_tracks(limit=50, offset=0)
 
     track_uris = []
@@ -22,7 +23,7 @@ def get_liked_track_uris(spotify):
     return track_uris
 
 
-def get_playlist_id(spotify):
+def get_playlist_id(spotify: Spotify):
     results = spotify.current_user_playlists(limit=50, offset=0)
 
     for playlist in results['items']:
@@ -39,7 +40,7 @@ def get_playlist_id(spotify):
     playlist = spotify.user_playlist_create(user['id'], "Syncify (Liked Songs)", public=False)
     return playlist['id']
 
-def sync(spotify):
+def sync(spotify: Spotify):
     track_uris = get_liked_track_uris(spotify)
     playlist_id = get_playlist_id(spotify)
 

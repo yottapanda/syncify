@@ -55,6 +55,9 @@ class WorkerThread(threading.Thread):
 
             with self.db as conn:
                 conn.execute("UPDATE sync_requests SET done = 1 WHERE id = ?", (request['id'],))
+
+
+            print("Sync complete for user", request['user_id'], "id", request['id'])
         if len(requests) == 0:
             time.sleep(1)
 

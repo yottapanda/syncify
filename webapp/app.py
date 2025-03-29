@@ -109,19 +109,6 @@ def home():
     return render_template("index.html")
 
 
-@app.route("/sync")
-def sync():
-    if 'id' not in session:
-        return redirect('/')
-    with get_db() as db:
-        user = db.execute("SELECT access_token, access_token_expiry FROM users WHERE id = ?", (session['id'],)).fetchone()
-    if user is None or user['access_token_expiry'] < time.time() + 300:
-        return redirect('/')
-
-    spotify = spotipy.Spotify(auth=user['access_token'])
-
-    return "Done"
-
 @app.route('/enqueue')
 def enqueue():
     if 'id' not in session:
