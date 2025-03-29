@@ -1,4 +1,4 @@
-.PHONY: dev build prod
+.PHONY: dev build prod worker
 
 deps:
 	pip install .
@@ -6,7 +6,11 @@ deps:
 # Development commands
 
 dev:
-	FLASK_ENV=development python3 -m webapp.app
+	python -m webapp.app
+
+worker:
+	python -m worker.main
+
 
 # Production commands
 
