@@ -5,9 +5,11 @@
   "keywords": [],
   "author": "",
   "scripts": {
-    "build": "npx tailwindcss -i style.css -o ./static/style.css"
+    "build": "pnpx @tailwindcss/cli -i style.css -o ./static/style.css --minify",
+    "dev": "pnpx @tailwindcss/cli -i style.css -o ./static/style.css --watch"
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.17"
+    "@tailwindcss/cli": "^4.0.7",
+    "tailwindcss": "^4.0.7"
   }
 }

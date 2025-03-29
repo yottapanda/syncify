@@ -1,4 +1,3 @@
-import datetime
 import os
 import sqlite3
 import threading
@@ -6,8 +5,7 @@ import time
 
 import spotipy
 
-from webapp.spotify import gen_auth_manager, sync
-
+from common.spotify import gen_auth_manager, sync
 
 class WorkerThread(threading.Thread):
     db = None

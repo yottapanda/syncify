@@ -2,7 +2,7 @@
 name = "syncify2"
 version = "0.0.0"
 requires-python = ">= 3.13"
-dependencies = ["flask", "spotipy", "flask_session2", "python-dotenv", "gunicorn"]
+dependencies = ["flask", "spotipy", "flask_session2", "python-dotenv", "uvicorn"]
 
 [tool.setuptools]
 py-modules = ["webapp"]

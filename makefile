@@ -6,7 +6,7 @@ deps:
 # Development commands
 
 dev:
-	flask --app webapp/app.py run --debug
+	FLASK_ENV=development python3 -m webapp.app
 
 # Production commands
 

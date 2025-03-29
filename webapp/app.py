@@ -1,15 +1,14 @@
 import os
-import signal
 import time
 
 import spotipy
+import uvicorn
 from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, session, g
 from flask_session import Session
 
-from webapp.db import connect
-from webapp.spotify import gen_auth_manager, get_liked_track_uris, get_playlist_id
-from webapp.worker import WorkerThread
+from common.db import connect
+from common.spotify import gen_auth_manager
 
 load_dotenv()
 
@@ -21,24 +20,6 @@ temp_conn.close()
 app = Flask(__name__, template_folder="../templates", static_folder="../static")
 app.secret_key = os.environ["SECRET_KEY"]
 Session(app)
-
-worker = WorkerThread()
-
-if not (app.debug or os.environ.get('FLASK_ENV') == 'development') or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
-    worker.start()
-
-    original_int_handler = signal.getsignal(signal.SIGINT)
-
-    def sigint_handler(signum, frame):
-        worker.stop()
-        if worker.is_alive():
-            worker.join()
-        original_int_handler(signum, frame)
-
-    try:
-        signal.signal(signal.SIGINT, sigint_handler)
-    except ValueError as e:
-        print(f'{e}. Continuing execution...')
 
 
 def get_db():
@@ -57,7 +38,7 @@ def get_auth_manager():
 
 @app.route("/auth/login")
 def login():
-    return redirect(get_auth_manager().get_authorize_url())
+    return render_template("login.html", login_url=get_auth_manager().get_authorize_url())
 
 
 @app.route("/auth/callback")
@@ -90,7 +71,7 @@ def logout():
 @app.route("/")
 def home():
     if 'id' not in session:
-        return render_template("login.html")
+        return redirect('/auth/login')
 
     with get_db() as db:
         user = db.execute("SELECT access_token, access_token_expiry, refresh_token FROM users WHERE id = ?", (session['id'],)).fetchone()
@@ -154,3 +135,9 @@ def enqueue():
         db.execute("INSERT INTO sync_requests (user_id) VALUES (?)", (session['id'],))
 
     return "Done"
+
+if __name__ == '__main__':
+    if os.environ.get('FLASK_ENV') == 'development':
+        app.run(debug=True)
+    else:
+        uvicorn.run(app, host='0.0.0.0', port=5000, workers=1)
