@@ -1,11 +1,11 @@
-.PHONY: dev build prod worker
+.PHONY: webapp build prod worker
 
 deps:
 	pip install .
 
 # Development commands
 
-dev:
+webapp:
 	python -m src.webapp.app
 
 worker:
