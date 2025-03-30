@@ -1,21 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flask with Tailwind</title>
-    <link
-      href="{{ url_for('static', filename='style.css') }}"
-      rel="stylesheet"
-    />
-  </head>
-  <body class="bg-gray-100 p-8">
-    <h1 class="text-4xl text-center text-blue-500">
-      Syncify
-    </h1>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Syncify</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+<h1>Syncify</h1>
 
-    <br><a href="/enqueue">Enqueue Sync</a>
-    <br><a href="/logout">Logout</a>
+<br><a href="/enqueue">Enqueue Sync</a>
+<br><a href="/jobs">View Sync Jobs</a>
+<br><a href="/auth/logout">Logout</a>
 
-  </body>
+</body>
 </html>

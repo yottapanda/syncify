@@ -9,6 +9,6 @@ __pycache__/
 
 /.git/
 /.gitignore
-/makefile
+/Makefile
 /.dockerignore
-/dockerfile
+/Dockerfile

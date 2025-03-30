@@ -20,7 +20,7 @@ RUN pip install .
 
 COPY . .
 
-COPY --from=build-tailwind /build/static/style.css ./static/style.css
+COPY --from=build-tailwind /build/src/webapp/static/style.css src/webapp/static/style.css
 
 VOLUME /data
 
@@ -28,4 +28,4 @@ ENV DB_FILE=/data/db.sqlite
 
 EXPOSE 5000
 
-CMD [ "sh", "-c", "python3 -m src.webapp.app" ]
+CMD [ "sh", "-c", "python3 -m src.webapp.main" ]
