@@ -1,10 +1,10 @@
-FROM docker.io/library/node:alpine AS build-tailwind
+FROM docker.io/library/node:alpine AS build-frontend
+
+RUN corepack enable pnpm
 
 WORKDIR /build
 
-COPY . .
-
-RUN corepack enable pnpm
+COPY frontend .
 
 RUN pnpm i
 
@@ -14,17 +14,15 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-COPY pyproject.toml .
+COPY requirements.txt .
 
-RUN pip install .
+RUN pip install -r requirements.txt
 
 COPY . .
 
-COPY --from=build-tailwind /build/src/webapp/static/style.css src/webapp/static/style.css
+ENV WEBSITE_PATH=frontend/dist
 
-VOLUME /data
-
-ENV DB_FILE=/data/db.sqlite
+COPY --from=build-frontend /build/dist frontend/dist
 
 EXPOSE 5000
 

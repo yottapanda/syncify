@@ -1,9 +1,7 @@
 /build/
 /*.egg-info/
-/node_modules/
 /.venv/
 /data/
 /.env
 /.cache
-/src/webapp/static/style.css
 __pycache__/

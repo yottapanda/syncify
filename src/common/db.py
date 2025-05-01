@@ -1,28 +1,42 @@
 from datetime import datetime
+from typing import Annotated
 
+from fastapi import Depends
 from sqlalchemy import String, Integer, ForeignKey, TIMESTAMP, create_engine
-from sqlalchemy.orm import DeclarativeBase, mapped_column, relationship
+from sqlalchemy.orm import DeclarativeBase, mapped_column, relationship, Session
 
 from src.common import conf
 
-engine = create_engine(conf.db_conn_string, echo=not conf.production)
+engine = create_engine(conf.db_conn_string)
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+
+SessionDep = Annotated[Session, Depends(get_session)]
+
 
 class Base(DeclarativeBase):
     pass
 
+
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = mapped_column(String, primary_key=True)
     refresh_token = mapped_column(String, nullable=False)
 
+
 class SyncRequest(Base):
-    __tablename__ = 'sync_requests'
+    __tablename__ = "sync_requests"
 
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id = mapped_column(String, ForeignKey('users.id'), index=True)
-    user = relationship("User", lazy='joined')
+    user_id = mapped_column(String, ForeignKey("users.id"), nullable=False, index=True)
     song_count = mapped_column(Integer, nullable=False, default=0)
     progress = mapped_column(Integer, nullable=False, default=0)
-    created = mapped_column(TIMESTAMP, nullable=False, default=datetime.now(), index=True)
+    created = mapped_column(
+        TIMESTAMP, nullable=False, default=datetime.now(), index=True
+    )
     completed = mapped_column(TIMESTAMP, nullable=True, index=True)

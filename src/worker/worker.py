@@ -3,13 +3,11 @@ import time
 from datetime import datetime
 
 import spotipy
-from sqlalchemy import asc
+from sqlalchemy import asc, select
 from sqlalchemy.orm import Session
 
-from src.common import db
-from src.common.auth import get_access_token
+from src.common import db, spotify
 from src.common.db import SyncRequest, User
-from src.common.spotify import gen_auth_manager, sync
 
 
 class WorkerThread(threading.Thread):
@@ -32,25 +30,31 @@ class WorkerThread(threading.Thread):
         pass
 
     def handle(self):
-        with Session(db.engine) as conn:
-            requests = conn.query(SyncRequest).filter(SyncRequest.completed == None).order_by(asc(SyncRequest.id)).limit(10).all()
+        with Session(db.engine) as db_session:
+            stmt = (
+                select(SyncRequest)
+                .join(User)
+                .where(SyncRequest.completed == None)
+                .order_by(SyncRequest.id.asc())
+                .limit(10)
+            )
+            requests = db_session.scalars(stmt).all()
 
-        for request in requests:
-            access_token = get_access_token(request.user.id, gen_auth_manager())
-            if not access_token:
-                print(f"Failed to get access token for user {request.user.id}")
-                continue
+            for request in requests:
+                access_token = spotify.get_access_token(request.user_id, db_session)
+                if not access_token:
+                    print(f"Failed to get access token for user {request.user_id}")
+                    continue
 
-            spotify = spotipy.Spotify(auth=access_token)
-            print(f"Syncing for user {request.user.id}: {request.id}")
-            sync(spotify)
+                client = spotipy.Spotify(auth=access_token)
+                print(f"Syncing for user {request.user_id}: {request.id}")
+                spotify.sync(client)
 
-            with Session(db.engine) as conn:
                 request.completed = datetime.now()
-                conn.merge(request)
-                conn.commit()
+                db_session.merge(request)
+                db_session.commit()
 
-            print(f"Sync complete for user {request.user.id}: {request.id}")
+                print(f"Sync complete for user {request.user_id}: {request.id}")
 
         if len(requests) == 0:
             time.sleep(1)
