@@ -1,4 +1,4 @@
-.PHONY: dev build prod worker
+.PHONY: $(wildcard *)
 
 deps:
 	pip install .
