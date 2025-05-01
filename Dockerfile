@@ -26,4 +26,4 @@ COPY --from=build-frontend /build/dist frontend/dist
 
 EXPOSE 5000
 
-CMD [ "sh", "-c", "python3 -m src.webapp.main" ]
+CMD [ "sh", "-c", "python3 -m src.main" ]

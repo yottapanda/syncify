@@ -10,7 +10,7 @@ frontend:
 	cd frontend && pnpm run dev
 
 api:
-	python -m src.webapp.main
+	python -m uvicorn src.webapp.main:app --reload
 
 worker:
 	python -m src.worker.main
