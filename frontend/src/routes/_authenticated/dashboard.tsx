@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button.tsx";
 import { User } from "@/lib/api/types.ts";
 import { RefreshCcw } from "lucide-react";
 import { toast } from "sonner";
+import { Progress } from "@/components/ui/progress.tsx";
+import { formatDistanceToNow } from "date-fns";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -30,6 +32,10 @@ function Dashboard() {
     enabled: false,
   });
 
+  // Helper function to format dates as relative time
+  const formatRelativeTime = (date: Date) =>
+    formatDistanceToNow(date, { addSuffix: true });
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-space-between">
@@ -37,7 +43,13 @@ function Dashboard() {
         <div className="flex items-center gap-4">
           {user && (
             <>
-              <p>{user?.display_name}</p>
+              <a
+                className="text-primary"
+                href={`https://open.spotify.com/user/${user.id}`}
+                target="_blank"
+              >
+                {user.display_name}
+              </a>
               <Button
                 variant="ghost"
                 onClick={async () => {
@@ -78,17 +90,22 @@ function Dashboard() {
             {jobsQuery.data?.map((job) => (
               <tr key={job.id} className="border-b">
                 <td className="px-4 py-2">{job.id}</td>
-                <td className="px-4 py-2">{job.created.toString()}</td>
+                <td className="px-4 py-2">
+                  {formatRelativeTime(new Date(job.created))}
+                </td>
                 <td className="px-4 py-2">{job.song_count}</td>
                 <td className="px-4 py-2">
-                  <progress
-                    value={job.completed ? 100 : job.progress}
-                    max={job.completed ? 100 : job.song_count}
+                  <Progress
+                    value={
+                      !!job.completed
+                        ? 100
+                        : (job.progress / job.song_count) * 100
+                    }
                   />
                 </td>
                 <td className="px-4 py-2">
                   {!!job.completed
-                    ? `Completed at ${job.completed.toString()}`
+                    ? `Completed ${formatRelativeTime(new Date(job.completed))}`
                     : job.progress === 0
                     ? "Queued"
                     : "Running"}
