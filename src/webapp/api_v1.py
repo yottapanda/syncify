@@ -80,7 +80,10 @@ def enqueue(
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, "You already have a pending sync request"
         )
-    db_session.add(SyncRequest(user_id=session_data.user_id))
+    access_token = spotify.get_access_token(session_data.user_id, db_session)
+    client = spotipy.Spotify(auth=access_token)
+    count = spotify.get_liked_count(client)
+    db_session.add(SyncRequest(user_id=session_data.user_id, song_count=count))
     db_session.commit()
 
 

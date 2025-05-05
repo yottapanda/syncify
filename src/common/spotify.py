@@ -75,3 +75,7 @@ def sync(spotify: Spotify):
 
         for chunk in chunks:
             spotify.playlist_add_items(playlist_id, chunk)
+
+
+def get_liked_count(client: Spotify):
+    return client.current_user_saved_tracks(limit=1)["total"]
