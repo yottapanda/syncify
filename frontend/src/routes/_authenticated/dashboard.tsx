@@ -15,11 +15,19 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function Dashboard() {
   const queryClient = useQueryClient();
   const user: User | undefined = queryClient.getQueryData(["user"]);
+
   const jobsQuery = useQuery({
     queryKey: ["jobs"],
     queryFn: getJobs,
-    refetchInterval: 5000,
+    refetchInterval: (q) => {
+      const jobs = q.state.data ?? [];
+      if (jobs.some((job) => !job.completed)) {
+        return 1000;
+      }
+      return 30000;
+    },
   });
+
   const enqueueJobQuery = useQuery({
     queryKey: ["enqueueJob"],
     queryFn: async () => {
@@ -27,6 +35,7 @@ function Dashboard() {
         toast(reason.message);
       });
       await queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      return null;
     },
     retry: false,
     enabled: false,
@@ -96,11 +105,7 @@ function Dashboard() {
                 <td className="px-4 py-2">{job.song_count}</td>
                 <td className="px-4 py-2">
                   <Progress
-                    value={
-                      !!job.completed
-                        ? 100
-                        : (job.progress / job.song_count) * 100
-                    }
+                    value={!!job.completed ? 100 : job.progress * 100}
                   />
                 </td>
                 <td className="px-4 py-2">

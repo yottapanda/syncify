@@ -17,9 +17,9 @@ def start_webapp():
 def start_worker():
     print("Starting worker...")
     while True:
+        time.sleep(1)
         try:
             worker.run()
-            time.sleep(1)
         except KeyboardInterrupt:
             print("KeyboardInterrupt: Stopping worker...")
             break

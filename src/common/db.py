@@ -2,8 +2,8 @@ from datetime import datetime
 from typing import Annotated
 
 from fastapi import Depends
-from sqlalchemy import String, Integer, ForeignKey, TIMESTAMP, create_engine
-from sqlalchemy.orm import DeclarativeBase, mapped_column, relationship, Session
+from sqlalchemy import String, Integer, ForeignKey, TIMESTAMP, create_engine, Float
+from sqlalchemy.orm import DeclarativeBase, mapped_column, Session
 
 from src.common import conf
 
@@ -35,7 +35,7 @@ class SyncRequest(Base):
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id = mapped_column(String, ForeignKey("users.id"), nullable=False, index=True)
     song_count = mapped_column(Integer, nullable=False, default=0)
-    progress = mapped_column(Integer, nullable=False, default=0)
+    progress = mapped_column(Float, nullable=False, default=0.0)
     created = mapped_column(
         TIMESTAMP, nullable=False, default=datetime.now(), index=True
     )

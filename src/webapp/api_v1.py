@@ -95,7 +95,7 @@ def jobs(
     stmt = (
         select(SyncRequest)
         .where(SyncRequest.user_id == session_data.user_id)
-        .order_by(SyncRequest.id.asc())
+        .order_by(SyncRequest.id.desc())
         .limit(10)
     )
     return db_session.scalars(stmt).all()

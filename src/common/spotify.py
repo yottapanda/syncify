@@ -23,22 +23,6 @@ def get_access_token(user_id: str, db_session: orm.Session) -> str | None:
     return response.get("access_token")
 
 
-def get_liked_track_uris(spotify: Spotify):
-    results = spotify.current_user_saved_tracks(limit=50, offset=0)
-
-    liked_track_uris = []
-
-    for track in results["items"]:
-        liked_track_uris.append(track["track"]["uri"])
-
-    while results["next"]:
-        results = spotify.next(results)
-        for track in results["items"]:
-            liked_track_uris.append(track["track"]["uri"])
-
-    return liked_track_uris
-
-
 def get_playlist_id(spotify: Spotify, playlist_name):
     results = spotify.current_user_playlists(limit=50, offset=0)
 
@@ -58,10 +42,27 @@ def get_playlist_id(spotify: Spotify, playlist_name):
 
 
 def sync(spotify: Spotify):
-    track_uris_raw = get_liked_track_uris(spotify)
+    progress = 0
+
+    results = spotify.current_user_saved_tracks(limit=50, offset=0)
+
+    liked_track_uris_raw = []
+
+    for track in results["items"]:
+        liked_track_uris_raw.append(track["track"]["uri"])
+    progress += len(results["items"])
+    yield progress
+
+    while results["next"]:
+        results = spotify.next(results)
+        for track in results["items"]:
+            liked_track_uris_raw.append(track["track"]["uri"])
+        progress += len(results["items"])
+        yield progress
 
     track_uris = [
-        track_uris_raw[i : i + 10000] for i in range(0, len(track_uris_raw), 10000)
+        liked_track_uris_raw[i : i + 10000]
+        for i in range(0, len(liked_track_uris_raw), 10000)
     ]
 
     for playlist_num, playlist_chunk in enumerate(track_uris, start=1):
@@ -75,7 +76,9 @@ def sync(spotify: Spotify):
 
         for chunk in chunks:
             spotify.playlist_add_items(playlist_id, chunk)
+            progress += len(chunk)
+            yield progress
 
 
-def get_liked_count(client: Spotify):
+def get_liked_count(client: Spotify) -> int:
     return client.current_user_saved_tracks(limit=1)["total"]
