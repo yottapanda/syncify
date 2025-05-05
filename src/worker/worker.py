@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import spotipy
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -21,12 +20,7 @@ def run():
         if not request:
             return
 
-        access_token = spotify.get_access_token(request.user_id, db_session)
-        if not access_token:
-            print(f"Failed to get access token for user {request.user_id}")
-            return
-
-        client = spotipy.Spotify(auth=access_token)
+        client = spotify.get_client(request.user_id, db_session)
 
         count = spotify.get_liked_count(client)
         if count is not request.song_count:
@@ -34,7 +28,7 @@ def run():
             db_session.merge(request)
             db_session.commit()
 
-        print(f"Starting {request.id} with {count} songs for {request.user_id}")
+        print(f"Starting request {request.id} with {count} songs for {request.user_id}")
         for progress in spotify.sync(client):
             request.progress = progress / (
                 count * 2
@@ -47,5 +41,5 @@ def run():
         db_session.commit()
 
         print(
-            f"Sync {request.id} complete for {request.user_id}; {request.song_count} songs"
+            f"Sync reqeust {request.id} complete for {request.user_id}; {request.song_count} songs"
         )

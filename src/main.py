@@ -1,10 +1,12 @@
 import time
+from datetime import datetime
 from multiprocessing import Process
 import signal
 import sys
 
 from src import alembic
 from src.common import conf
+from src.scheduler import scheduler
 from src.webapp.app import app
 import uvicorn
 from src.worker import worker
@@ -17,11 +19,28 @@ def start_webapp():
 def start_worker():
     print("Starting worker...")
     while True:
-        time.sleep(1)
         try:
             worker.run()
+            time.sleep(1)
         except KeyboardInterrupt:
             print("KeyboardInterrupt: Stopping worker...")
+            break
+        except Exception as e:
+            print(f"Exception: {e}")
+            continue
+
+
+def start_scheduler():
+    print("Starting scheduler...")
+    last_run = datetime.min
+    while True:
+        try:
+            if datetime.now() > last_run + conf.scheduler_interval:
+                last_run = datetime.now()
+                scheduler.run()
+            time.sleep(5)
+        except KeyboardInterrupt:
+            print("KeyboardInterrupt: Stopping scheduler...")
             break
         except Exception as e:
             print(f"Exception: {e}")

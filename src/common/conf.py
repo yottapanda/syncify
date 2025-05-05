@@ -1,3 +1,4 @@
+import datetime
 import os
 import secrets
 
@@ -35,3 +36,5 @@ db_conn_string = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_
 secret_key = _read("SECRET_KEY", secrets.token_hex())
 
 website_path = _read("WEBSITE_PATH")
+
+scheduler_interval = datetime.timedelta(seconds=_read_int("SCHEDULER_INTERVAL", 86400))

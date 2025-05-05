@@ -1,15 +1,17 @@
 import spotipy
-from spotipy import Spotify, SpotifyOAuth
-from sqlalchemy import orm
+from spotipy import Spotify
+from sqlalchemy.orm import Session
 
-from src.common.db import User
+from src.common import db
 
 scope = "playlist-read-private,playlist-modify-private,user-library-read,playlist-modify-public"
 oauth = spotipy.oauth2.SpotifyOAuth(scope=scope)
 
 
-def get_access_token(user_id: str, db_session: orm.Session) -> str | None:
-    user = db_session.get(User, user_id)
+def get_client(
+    user_id: str, db_session: Session, commit: bool = True
+) -> Spotify | None:
+    user = db_session.get(db.User, user_id)
     if user is None:
         print(f"user {user_id} not found")
         return None
@@ -19,8 +21,9 @@ def get_access_token(user_id: str, db_session: orm.Session) -> str | None:
         return None
     user.refresh_token = response["refresh_token"]
     db_session.merge(user)
-    db_session.commit()
-    return response.get("access_token")
+    if commit:
+        db_session.commit()
+    return Spotify(response.get("access_token"))
 
 
 def get_playlist_id(spotify: Spotify, playlist_name):

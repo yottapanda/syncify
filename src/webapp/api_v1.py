@@ -1,7 +1,6 @@
 import secrets
 from uuid import uuid4, UUID
 
-import spotipy
 from fastapi import Request, Depends, HTTPException, APIRouter
 from fastapi_sessions.backends.session_backend import BackendError
 
@@ -40,6 +39,8 @@ async def callback(
     if request.query_params.get("state") != session_data.state:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Invalid state")
     token_response = spotify.oauth.get_access_token(request.query_params.get("code"))
+    import spotipy
+
     client = spotipy.Spotify(auth=token_response["access_token"])
     user = client.current_user()
     db_session.merge(User(id=user["id"], refresh_token=token_response["refresh_token"]))
@@ -57,8 +58,7 @@ def get_user(
 ):
     if session_data.user_id is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not logged in")
-    access_token = spotify.get_access_token(session_data.user_id, db_session)
-    client = spotipy.Spotify(auth=access_token)
+    client = spotify.get_client(session_data.user_id, db_session)
     user = client.me()
     return UserResponse(id=user["id"], display_name=user["display_name"])
 
@@ -80,10 +80,10 @@ def enqueue(
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, "You already have a pending sync request"
         )
-    access_token = spotify.get_access_token(session_data.user_id, db_session)
-    client = spotipy.Spotify(auth=access_token)
+    client = spotify.get_client(session_data.user_id, db_session)
     count = spotify.get_liked_count(client)
-    db_session.add(SyncRequest(user_id=session_data.user_id, song_count=count))
+    sync_request = SyncRequest(user_id=session_data.user_id, song_count=count)
+    db_session.add(sync_request)
     db_session.commit()
 
 
