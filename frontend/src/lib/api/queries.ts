@@ -5,7 +5,6 @@ export async function enqueueJob() {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Accept: "application/json, application/problem+json",
     },
   });
   if (!response.ok) {
@@ -19,6 +18,15 @@ export async function getJobs() {
     throw new Error((await response.json()).detail);
   }
   return (await response.json()) as SyncRequest[];
+}
+
+export async function deleteJob(id: number) {
+  const response = await fetch(`/api/v1/jobs/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    throw new Error((await response.json()).detail);
+  }
 }
 
 export async function getUser(): Promise<User> {

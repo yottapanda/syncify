@@ -7,10 +7,11 @@ import {
   hasActiveSubscription,
   manageSubscription,
   subscribe,
+  deleteJob,
 } from "@/lib/api/queries.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { User } from "@/lib/api/types.ts";
-import { LoaderCircle, RefreshCcw } from "lucide-react";
+import { LoaderCircle, RefreshCcw, X } from "lucide-react";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress.tsx";
 import { formatDistanceToNow } from "date-fns";
@@ -75,6 +76,11 @@ function Dashboard() {
   // Helper function to format dates as relative time
   const formatRelativeTime = (date: Date) =>
     formatDistanceToNow(date, { addSuffix: true });
+
+  async function handleDelete(jobId: number) {
+    await deleteJob(jobId).catch((e) => toast(e.message));
+    await queryClient.invalidateQueries({ queryKey: ["jobs"] });
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -174,6 +180,7 @@ function Dashboard() {
               <th className="px-4 py-2 text-left">Song Count</th>
               <th className="px-4 py-2 text-left">Progress</th>
               <th className="px-4 py-2 text-left">State</th>
+              <th className="px-4 py-2 text-left">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -195,6 +202,16 @@ function Dashboard() {
                     : job.progress === 0
                     ? "Queued"
                     : "Running"}
+                </td>
+                <td className="px-4 py-2">
+                  {job.progress === 0 && (
+                    <Button
+                      variant="outline"
+                      onClick={() => handleDelete(job.id)}
+                    >
+                      <X /> Cancel
+                    </Button>
+                  )}
                 </td>
               </tr>
             ))}

@@ -102,6 +102,26 @@ def jobs(
     return db_session.scalars(stmt).all()
 
 
+@router.delete("/jobs/{job_id}", dependencies=[Depends(session.cookie)])
+def delete_job(
+    job_id: int,
+    db_session: db.SessionDep,
+    session_data: SessionData | BackendError = Depends(session.verifier),
+):
+    if session_data.user_id is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not logged in")
+    stmt = select(SyncRequest).where(
+        SyncRequest.id == job_id,
+        SyncRequest.user_id == session_data.user_id,
+        SyncRequest.progress == 0,
+    )
+    job = db_session.scalars(stmt).one_or_none()
+    if not job:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Job not found")
+    db_session.delete(job)
+    db_session.commit()
+
+
 @router.get("/stripe/has_active_subscription", dependencies=[Depends(session.cookie)])
 def stripe_has_active_subscription(
     db_session: db.SessionDep,
