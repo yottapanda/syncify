@@ -15,6 +15,7 @@ import { LoaderCircle, RefreshCcw, X } from "lucide-react";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress.tsx";
 import { formatDistanceToNow } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import {
   Dialog,
   DialogClose,
@@ -73,9 +74,12 @@ function Dashboard() {
   const [manageLoading, setManageLoading] = useState(false);
   const [subscribeLoading, setSubscribeLoading] = useState(false);
 
-  // Helper function to format dates as relative time
-  const formatRelativeTime = (date: Date) =>
-    formatDistanceToNow(date, { addSuffix: true });
+  // Helper function to format dates as relative time using user's current timezone
+  const formatRelativeTime = (date: Date) => {
+    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const zonedDate = toZonedTime(date, userTimeZone);
+    return formatDistanceToNow(zonedDate, { addSuffix: true });
+  };
 
   async function handleDelete(jobId: number) {
     await deleteJob(jobId).catch((e) => toast(e.message));
