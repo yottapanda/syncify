@@ -3,9 +3,12 @@ from spotipy import Spotify
 from sqlalchemy.orm import Session
 
 from src.common import db
+from src.common.conf import base_uri
 
 scope = "playlist-read-private,playlist-modify-private,user-library-read,playlist-modify-public"
-oauth = spotipy.oauth2.SpotifyOAuth(scope=scope)
+oauth = spotipy.oauth2.SpotifyOAuth(
+    scope=scope, redirect_uri=base_uri + "/api/v1/auth/callback"
+)
 
 
 def get_client(

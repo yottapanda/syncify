@@ -1,12 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { enqueueJob, getJobs, handleLogout } from "@/lib/api/queries.ts";
+import {
+  enqueueJob,
+  getJobs,
+  handleLogout,
+  hasActiveSubscription,
+  manageSubscription,
+  subscribe,
+} from "@/lib/api/queries.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { User } from "@/lib/api/types.ts";
-import { RefreshCcw } from "lucide-react";
+import { LoaderCircle, RefreshCcw } from "lucide-react";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress.tsx";
 import { formatDistanceToNow } from "date-fns";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog.tsx";
+import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -41,6 +59,19 @@ function Dashboard() {
     enabled: false,
   });
 
+  const subscriptionQuery = useQuery({
+    queryKey: ["subscription"],
+    queryFn: async () => {
+      return await hasActiveSubscription().catch((e) => {
+        toast(e.message);
+        return false;
+      });
+    },
+  });
+
+  const [manageLoading, setManageLoading] = useState(false);
+  const [subscribeLoading, setSubscribeLoading] = useState(false);
+
   // Helper function to format dates as relative time
   const formatRelativeTime = (date: Date) =>
     formatDistanceToNow(date, { addSuffix: true });
@@ -74,7 +105,58 @@ function Dashboard() {
           )}
         </div>
       </div>
-      <div className="flex items-center justify-end gap-4">
+      <div className="flex flex-wrap items-center justify-end gap-4">
+        {subscriptionQuery.isLoading && (
+          <LoaderCircle className="animate-spin" />
+        )}
+        {!subscriptionQuery.isLoading && subscriptionQuery.data && (
+          <Button
+            variant="link"
+            disabled={manageLoading}
+            onClick={() => {
+              setManageLoading(true);
+              manageSubscription()
+                .catch((e) => toast(e.message))
+                .finally(() => setManageLoading(false));
+            }}
+          >
+            Syncing every 24 hours
+          </Button>
+        )}
+        {!subscriptionQuery.isLoading && !subscriptionQuery.data && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Sync every 24 hours</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Purchase a Syncify Subscription</DialogTitle>
+                <DialogDescription>
+                  Syncify will run a sync job for you every day
+                </DialogDescription>
+              </DialogHeader>
+              <DialogClose />
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  disabled={subscribeLoading}
+                  onClick={() => {
+                    setSubscribeLoading(true);
+                    subscribe()
+                      .catch((e) => toast(e.message))
+                      .finally(() => setSubscribeLoading(false));
+                  }}
+                >
+                  Subscribe
+                </Button>
+                <DialogClose asChild>
+                  <Button variant="ghost">Cancel</Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
+        <Button onClick={() => enqueueJobQuery.refetch()}>Enqueue Sync</Button>
         <Button
           variant="outline"
           disabled={jobsQuery.isFetching}
@@ -82,7 +164,6 @@ function Dashboard() {
         >
           <RefreshCcw /> Refresh
         </Button>
-        <Button onClick={() => enqueueJobQuery.refetch()}>Enqueue Sync</Button>
       </div>
       <div className="overflow-x-auto">
         <table className="table-auto w-full border-collapse">

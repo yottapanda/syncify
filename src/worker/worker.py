@@ -23,7 +23,7 @@ def run():
         client = spotify.get_client(request.user_id, db_session)
 
         count = spotify.get_liked_count(client)
-        if count is not request.song_count:
+        if count != request.song_count:
             request.song_count = count
             db_session.merge(request)
             db_session.commit()

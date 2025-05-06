@@ -8,3 +8,4 @@ pydantic~=2.11.2
 alembic~=1.15.2
 psycopg2-binary~=2.9.10
 fastapi_sessions==0.3.2
+stripe~=12.1.0

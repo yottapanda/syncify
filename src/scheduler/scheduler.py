@@ -3,22 +3,19 @@ from datetime import datetime
 from sqlalchemy import select, exists
 from sqlalchemy.orm import Session
 
-from src.common import db, spotify
+from src.common import db, spotify, stripe
 
 
 def run():
     with Session(db.engine) as db_session:
-        stmt = select(db.User).where(
-            ~exists(
-                select(1)
-                .select_from(db.SyncRequest)
-                .where(
-                    (db.SyncRequest.user_id == db.User.id)
-                    & (db.SyncRequest.completed == None)
-                )
-            )
-        )
+        stmt = select(db.User)
         users = db_session.scalars(stmt).all()
+
+        users = [
+            user
+            for user in users
+            if stripe.has_active_subscription(user.stripe_customer_id)
+        ]
 
         new_requests = []
         for user in users:

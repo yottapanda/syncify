@@ -8,7 +8,7 @@ from sqlalchemy import select
 from starlette import status
 from starlette.responses import Response, RedirectResponse
 
-from src.common import db, spotify
+from src.common import db, spotify, stripe, conf
 from src.common.db import User, SyncRequest
 from src.webapp import session
 from src.webapp.session import SessionData
@@ -18,12 +18,9 @@ router = APIRouter(prefix="/api/v1", tags=["API v1"])
 
 
 @router.get("/auth/login")
-async def login(response: Response, post_callback_redirect_url: str) -> str:
+async def login(response: Response) -> str:
     session_id = uuid4()
-    data = session.SessionData(
-        state=secrets.token_urlsafe(),
-        post_callback_redirect_url=post_callback_redirect_url,
-    )
+    data = session.SessionData(state=secrets.token_urlsafe())
     await session.backend.create(session_id, data)
     session.cookie.attach_to_response(response, session_id)
     return spotify.oauth.get_authorize_url(data.state)
@@ -47,7 +44,7 @@ async def callback(
     db_session.commit()
     await session.backend.update(session_id, SessionData(user_id=user["id"]))
     return RedirectResponse(
-        session_data.post_callback_redirect_url, status_code=status.HTTP_302_FOUND
+        conf.base_uri + "/dashboard", status_code=status.HTTP_302_FOUND
     )
 
 
@@ -73,6 +70,8 @@ def enqueue(
     db_session: db.SessionDep,
     session_data: SessionData | BackendError = Depends(session.verifier),
 ):
+    if session_data.user_id is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not logged in")
     stmt = select(SyncRequest).where(
         SyncRequest.user_id == session_data.user_id, SyncRequest.completed == None
     )
@@ -92,6 +91,8 @@ def jobs(
     db_session: db.SessionDep,
     session_data: SessionData | BackendError = Depends(session.verifier),
 ):
+    if session_data.user_id is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not logged in")
     stmt = (
         select(SyncRequest)
         .where(SyncRequest.user_id == session_data.user_id)
@@ -99,3 +100,51 @@ def jobs(
         .limit(10)
     )
     return db_session.scalars(stmt).all()
+
+
+@router.get("/stripe/has_active_subscription", dependencies=[Depends(session.cookie)])
+def stripe_has_active_subscription(
+    db_session: db.SessionDep,
+    session_data: SessionData | BackendError = Depends(session.verifier),
+) -> bool:
+    if session_data.user_id is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not logged in")
+    customer_id = db_session.scalars(
+        select(User.stripe_customer_id).where(User.id == session_data.user_id)
+    ).one_or_none()
+    return stripe.has_active_subscription(customer_id)
+
+
+@router.get("/stripe/subscribe", dependencies=[Depends(session.cookie)])
+def stripe_pay(
+    db_session: db.SessionDep,
+    session_data: SessionData | BackendError = Depends(session.verifier),
+) -> str:
+    if session_data.user_id is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not logged in")
+    customer_id = db_session.scalars(
+        select(User.stripe_customer_id).where(User.id == session_data.user_id)
+    ).one_or_none()
+    if stripe.has_active_subscription(customer_id):
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, "You already have an active subscription"
+        )
+    checkout_url = stripe.create_checkout_session(customer_id)
+    if not checkout_url:
+        raise HTTPException(
+            status.HTTP_500_INTERNAL_SERVER_ERROR, "Failed to create checkout session"
+        )
+    return checkout_url
+
+
+@router.get("/stripe/manage", dependencies=[Depends(session.cookie)])
+def stripe_manage_subscription(
+    db_session: db.SessionDep,
+    session_data: SessionData | BackendError = Depends(session.verifier),
+) -> str:
+    if session_data.user_id is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not logged in")
+    customer_id = db_session.scalars(
+        select(User.stripe_customer_id).where(User.id == session_data.user_id)
+    ).one_or_none()
+    return stripe.get_portal_url(customer_id)

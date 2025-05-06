@@ -9,7 +9,6 @@ from src.common import conf
 
 class SessionData(BaseModel):
     state: str | None = None
-    post_callback_redirect_url: str | None = None
     user_id: str | None = None
 
 

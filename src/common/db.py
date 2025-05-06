@@ -5,7 +5,7 @@ from fastapi import Depends
 from sqlalchemy import String, Integer, ForeignKey, TIMESTAMP, create_engine, Float
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Session
 
-from src.common import conf
+from src.common import conf, stripe
 
 engine = create_engine(conf.db_conn_string)
 
@@ -27,6 +27,9 @@ class User(Base):
 
     id = mapped_column(String, primary_key=True)
     refresh_token = mapped_column(String, nullable=False)
+    stripe_customer_id = mapped_column(
+        String, nullable=False, default=stripe.create_customer
+    )
 
 
 class SyncRequest(Base):
