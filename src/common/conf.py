@@ -25,7 +25,7 @@ def _read_bool(name: str, default: bool = False) -> bool:
 host = _read("HOST", "localhost")
 port = _read_int("PORT", 5000)
 
-base_uri = _read("WEBAPP_BASE_URI", "http://localhost:5173").removesuffix("/")
+base_uri = _read("BASE_URI", "http://localhost:5173").removesuffix("/")
 
 db_host = _read("DB_HOST", "localhost")
 db_port = _read_int("DB_PORT", 5432)
@@ -37,7 +37,8 @@ db_conn_string = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_
 
 secret_key = _read("SECRET_KEY", secrets.token_hex())
 
-website_path = _read("WEBSITE_PATH")
+# Just for docker image
+website_path = _read("WEBSITE_PATH", optional=True)
 
 scheduler_interval = datetime.timedelta(seconds=_read_int("SCHEDULER_INTERVAL", 86400))
 
