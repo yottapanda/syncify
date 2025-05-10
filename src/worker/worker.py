@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
 from src.common import db, spotify
@@ -36,7 +34,7 @@ def run():
             db_session.merge(request)
             db_session.commit()
 
-        request.completed = datetime.now()
+        request.completed = func.now()
         db_session.merge(request)
         db_session.commit()
 

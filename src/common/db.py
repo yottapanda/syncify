@@ -1,8 +1,15 @@
-from datetime import datetime
 from typing import Annotated, Any, Generator
 
 from fastapi import Depends
-from sqlalchemy import String, Integer, ForeignKey, TIMESTAMP, create_engine, Float
+from sqlalchemy import (
+    String,
+    Integer,
+    ForeignKey,
+    TIMESTAMP,
+    create_engine,
+    Float,
+    func,
+)
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Session
 
 from src.common import conf, stripe
@@ -22,6 +29,12 @@ class Base(DeclarativeBase):
     pass
 
 
+class TimestampMixin(object):
+    created = mapped_column(
+        TIMESTAMP(True), nullable=False, server_default=func.now(), index=True
+    )
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -32,12 +45,11 @@ class User(Base):
     )
 
 
-class SyncRequest(Base):
+class SyncRequest(Base, TimestampMixin):
     __tablename__ = "sync_requests"
 
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id = mapped_column(String, ForeignKey("users.id"), nullable=False, index=True)
     song_count = mapped_column(Integer, nullable=False, default=0)
     progress = mapped_column(Float, nullable=False, default=0.0)
-    created = mapped_column(TIMESTAMP, nullable=False, default=datetime.now, index=True)
-    completed = mapped_column(TIMESTAMP, nullable=True, index=True)
+    completed = mapped_column(TIMESTAMP(True), nullable=True, index=True)

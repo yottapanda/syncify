@@ -14,8 +14,6 @@ import { User } from "@/lib/api/types.ts";
 import { LoaderCircle, RefreshCcw, X } from "lucide-react";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress.tsx";
-import { formatDistanceToNow } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
 import {
   Dialog,
   DialogClose,
@@ -27,6 +25,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog.tsx";
 import { useState } from "react";
+import { relative_time } from "@/lib/utils.ts";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -73,13 +72,6 @@ function Dashboard() {
 
   const [manageLoading, setManageLoading] = useState(false);
   const [subscribeLoading, setSubscribeLoading] = useState(false);
-
-  // Helper function to format dates as relative time using user's current timezone
-  const formatRelativeTime = (date: Date) => {
-    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const zonedDate = toZonedTime(date, userTimeZone);
-    return formatDistanceToNow(zonedDate, { addSuffix: true });
-  };
 
   async function handleDelete(jobId: number) {
     await deleteJob(jobId).catch((e) => toast(e.message));
@@ -192,7 +184,7 @@ function Dashboard() {
               <tr key={job.id} className="border-b">
                 <td className="px-4 py-2">{job.id}</td>
                 <td className="px-4 py-2">
-                  {formatRelativeTime(new Date(job.created))}
+                  {relative_time(new Date(job.created))}
                 </td>
                 <td className="px-4 py-2">{job.song_count}</td>
                 <td className="px-4 py-2">
@@ -202,7 +194,7 @@ function Dashboard() {
                 </td>
                 <td className="px-4 py-2">
                   {!!job.completed
-                    ? `Completed ${formatRelativeTime(new Date(job.completed))}`
+                    ? `Completed ${relative_time(new Date(job.completed))}`
                     : job.progress === 0
                     ? "Queued"
                     : "Running"}
