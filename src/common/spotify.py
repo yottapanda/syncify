@@ -2,8 +2,8 @@ import spotipy
 from spotipy import Spotify
 from sqlalchemy.orm import Session
 
-from src.common import db
-from src.common.conf import base_uri
+from common import db
+from common.conf import base_uri
 
 scope = "playlist-read-private,playlist-modify-private,user-library-read,playlist-modify-public"
 oauth = spotipy.oauth2.SpotifyOAuth(

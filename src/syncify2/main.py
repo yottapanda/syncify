@@ -4,12 +4,13 @@ from multiprocessing import Process
 import signal
 import sys
 
-from src import alembic
-from src.common import conf
-from src.scheduler import scheduler
-from src.webapp.app import app
+
 import uvicorn
-from src.worker import worker
+
+from common import conf, alembic
+from scheduler import scheduler
+from webapp.app import app
+from worker import worker
 
 
 def start_webapp():
@@ -52,22 +53,21 @@ def signal_handler(sig, frame):
     sys.exit(0)
 
 
-if __name__ == "__main__":
-    alembic.upgrade()
+alembic.upgrade()
 
-    # Register signal handlers
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
+# Register signal handlers
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 
-    # Create processes
-    webapp_process = Process(target=start_webapp)
-    worker_process = Process(target=start_worker)
+# Create processes
+webapp_process = Process(target=start_webapp)
+worker_process = Process(target=start_worker)
 
-    # Start both processes
-    print("Starting webapp and worker...")
-    webapp_process.start()
-    worker_process.start()
+# Start both processes
+print("Starting webapp and worker...")
+webapp_process.start()
+worker_process.start()
 
-    # Wait for processes to complete (they will run until interrupted)
-    webapp_process.join()
-    worker_process.join()
+# Wait for processes to complete (they will run until interrupted)
+webapp_process.join()
+worker_process.join()

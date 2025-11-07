@@ -1,7 +1,7 @@
 import time
 
-from src import alembic
-from src.worker import worker
+from common import alembic
+from worker import worker
 
 if __name__ == "__main__":
     alembic.check()

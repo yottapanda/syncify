@@ -8,11 +8,11 @@ from sqlalchemy import select
 from starlette import status
 from starlette.responses import Response, RedirectResponse
 
-from src.common import db, spotify, stripe, conf
-from src.common.db import User, SyncRequest
-from src.webapp import session
-from src.webapp.session import SessionData
-from src.webapp.types import UserResponse
+from common import db, spotify, stripe, conf
+from common.db import User, SyncRequest
+from webapp import session
+from webapp.session import SessionData
+from webapp.types import UserResponse
 
 router = APIRouter(prefix="/api/v1", tags=["API v1"])
 

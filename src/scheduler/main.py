@@ -1,9 +1,8 @@
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from src import alembic
-from src.common import conf
-from src.scheduler import scheduler
+from common import conf, alembic
+from scheduler import scheduler
 
 if __name__ == "__main__":
     alembic.check()

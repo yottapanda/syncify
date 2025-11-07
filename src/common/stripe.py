@@ -1,7 +1,7 @@
 from stripe import StripeClient
 
-from src.common import conf
-from src.common.conf import stripe_secret_key
+from common import conf
+from common.conf import stripe_secret_key
 
 
 client = StripeClient(stripe_secret_key)

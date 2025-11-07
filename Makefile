@@ -10,10 +10,10 @@ frontend:
 	cd frontend && pnpm run dev
 
 api:
-	python -m uvicorn src.webapp.main:app --reload
+	python -m uvicorn webapp.main:app --reload
 
 worker:
-	python -m src.worker.main
+	python -m worker.main
 
 
 # Docker setup commands

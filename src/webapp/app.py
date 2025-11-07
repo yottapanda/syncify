@@ -1,13 +1,11 @@
 import os
-from pathlib import Path
 
 from fastapi import FastAPI
-from starlette import status
-from starlette.responses import RedirectResponse, FileResponse
+from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
-from src.common import conf
-from src.webapp import api_v1
+from common import conf
+from webapp import api_v1
 
 app = FastAPI()
 

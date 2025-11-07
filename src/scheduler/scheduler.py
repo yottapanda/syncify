@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import select, exists
 from sqlalchemy.orm import Session
 
-from src.common import db, spotify, stripe
+from common import db, spotify, stripe
 
 
 def run():

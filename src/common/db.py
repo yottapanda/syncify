@@ -12,7 +12,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Session
 
-from src.common import conf, stripe
+from common import conf, stripe
 
 engine = create_engine(conf.db_conn_string)
 

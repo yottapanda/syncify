@@ -1,4 +1,5 @@
 import alembic.command
+
 from alembic.config import Config
 
 

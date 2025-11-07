@@ -4,7 +4,7 @@ from fastapi_sessions.backends.implementations import InMemoryBackend
 from fastapi_sessions.frontends.implementations import SessionCookie, CookieParameters
 from pydantic import BaseModel
 
-from src.common import conf
+from common import conf
 
 
 class SessionData(BaseModel):
