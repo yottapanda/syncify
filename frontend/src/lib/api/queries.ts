@@ -39,33 +39,6 @@ export async function getUser(): Promise<User> {
   return await response.json();
 }
 
-export async function hasActiveSubscription(): Promise<boolean> {
-  const response = await fetch("/api/v1/stripe/has_active_subscription");
-  if (response.ok) {
-    return await response.json();
-  } else {
-    throw new Error((await response.json()).detail);
-  }
-}
-
-export async function subscribe() {
-  const response = await fetch("/api/v1/stripe/subscribe");
-  if (response.ok) {
-    window.location.assign(await response.json());
-  } else {
-    throw new Error((await response.json()).detail);
-  }
-}
-
-export async function manageSubscription() {
-  const response = await fetch("/api/v1/stripe/manage");
-  if (response.ok) {
-    window.location.assign(await response.json());
-  } else {
-    throw new Error((await response.json()).detail);
-  }
-}
-
 export async function handleLogin() {
   const response = await fetch("/api/v1/auth/login");
   if (response.ok) {

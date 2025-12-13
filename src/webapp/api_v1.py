@@ -3,12 +3,11 @@ from uuid import uuid4, UUID
 
 from fastapi import Request, Depends, HTTPException, APIRouter
 from fastapi_sessions.backends.session_backend import BackendError
-
 from sqlalchemy import select
 from starlette import status
 from starlette.responses import Response, RedirectResponse
 
-from common import db, spotify, stripe, conf
+from common import db, spotify, conf
 from common.db import User, SyncRequest
 from webapp import session
 from webapp.session import SessionData
@@ -120,51 +119,3 @@ def delete_job(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Job not found")
     db_session.delete(job)
     db_session.commit()
-
-
-@router.get("/stripe/has_active_subscription", dependencies=[Depends(session.cookie)])
-def stripe_has_active_subscription(
-    db_session: db.SessionDep,
-    session_data: SessionData | BackendError = Depends(session.verifier),
-) -> bool:
-    if session_data.user_id is None:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not logged in")
-    customer_id = db_session.scalars(
-        select(User.stripe_customer_id).where(User.id == session_data.user_id)
-    ).one_or_none()
-    return stripe.has_active_subscription(customer_id)
-
-
-@router.get("/stripe/subscribe", dependencies=[Depends(session.cookie)])
-def stripe_pay(
-    db_session: db.SessionDep,
-    session_data: SessionData | BackendError = Depends(session.verifier),
-) -> str:
-    if session_data.user_id is None:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not logged in")
-    customer_id = db_session.scalars(
-        select(User.stripe_customer_id).where(User.id == session_data.user_id)
-    ).one_or_none()
-    if stripe.has_active_subscription(customer_id):
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, "You already have an active subscription"
-        )
-    checkout_url = stripe.create_checkout_session(customer_id)
-    if not checkout_url:
-        raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR, "Failed to create checkout session"
-        )
-    return checkout_url
-
-
-@router.get("/stripe/manage", dependencies=[Depends(session.cookie)])
-def stripe_manage_subscription(
-    db_session: db.SessionDep,
-    session_data: SessionData | BackendError = Depends(session.verifier),
-) -> str:
-    if session_data.user_id is None:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not logged in")
-    customer_id = db_session.scalars(
-        select(User.stripe_customer_id).where(User.id == session_data.user_id)
-    ).one_or_none()
-    return stripe.get_portal_url(customer_id)

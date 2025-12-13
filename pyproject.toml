@@ -18,7 +18,6 @@ dependencies = [
     "alembic~=1.17.1",
     "psycopg2-binary~=2.9.10",
     "fastapi_sessions==0.3.2",
-    "stripe~=14.0.1"
 ]
 
 [project.scripts]
@@ -26,3 +25,7 @@ syncify2 = "syncify2:main"
 scheduler = "scheduler:main"
 webapp = "webapp:main"
 worker = "worker:main"
+
+[build-system]
+requires = ["uv_build>=0.9.7,<0.10.0"]
+build-backend = "uv_build"

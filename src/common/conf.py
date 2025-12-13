@@ -41,6 +41,3 @@ secret_key = _read("SECRET_KEY", secrets.token_hex())
 website_path = _read("WEBSITE_PATH", optional=True)
 
 scheduler_interval = datetime.timedelta(seconds=_read_int("SCHEDULER_INTERVAL", 86400))
-
-stripe_secret_key = _read("STRIPE_SECRET_KEY")
-stripe_product_id = _read("STRIPE_PRODUCT_ID")

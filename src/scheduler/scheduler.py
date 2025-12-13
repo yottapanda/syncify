@@ -1,21 +1,15 @@
 from datetime import datetime
 
-from sqlalchemy import select, exists
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from common import db, spotify, stripe
+from common import db, spotify
 
 
 def run():
     with Session(db.engine) as db_session:
         stmt = select(db.User)
         users = db_session.scalars(stmt).all()
-
-        users = [
-            user
-            for user in users
-            if stripe.has_active_subscription(user.stripe_customer_id)
-        ]
 
         new_requests = []
         for user in users:

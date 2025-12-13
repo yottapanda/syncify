@@ -12,7 +12,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Session
 
-from common import conf, stripe
+from common import conf
 
 engine = create_engine(conf.db_conn_string)
 
@@ -40,9 +40,6 @@ class User(Base):
 
     id = mapped_column(String, primary_key=True)
     refresh_token = mapped_column(String, nullable=False)
-    stripe_customer_id = mapped_column(
-        String, nullable=False, default=stripe.create_customer
-    )
 
 
 class SyncRequest(Base, TimestampMixin):
