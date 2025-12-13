@@ -63,12 +63,15 @@ signal.signal(signal.SIGTERM, signal_handler)
 # Create processes
 webapp_process = Process(target=start_webapp)
 worker_process = Process(target=start_worker)
+scheduler_process = Process(target=start_scheduler)
 
 # Start both processes
-print("Starting webapp and worker...")
+print("Starting webapp, worker, and scheduler...")
 webapp_process.start()
 worker_process.start()
+scheduler_process.start()
 
 # Wait for processes to complete (they will run until interrupted)
 webapp_process.join()
 worker_process.join()
+scheduler_process.join()
