@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from common import db, spotify
+from syncify2.common import spotify, db
 
 
 def run():

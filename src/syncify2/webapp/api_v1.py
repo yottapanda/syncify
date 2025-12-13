@@ -7,11 +7,11 @@ from sqlalchemy import select
 from starlette import status
 from starlette.responses import Response, RedirectResponse
 
-from common import db, spotify, conf
-from common.db import User, SyncRequest
-from webapp import session
-from webapp.session import SessionData
-from webapp.types import UserResponse
+from syncify2.common import spotify, conf, db
+from syncify2.common.db import User, SyncRequest
+from syncify2.webapp import session
+from syncify2.webapp.session import SessionData
+from syncify2.webapp.types import UserResponse
 
 router = APIRouter(prefix="/api/v1", tags=["API v1"])
 

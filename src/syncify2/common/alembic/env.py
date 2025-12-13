@@ -5,7 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from common import conf, db
+from syncify2.common import conf, db
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

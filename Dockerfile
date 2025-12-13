@@ -1,6 +1,6 @@
 FROM docker.io/library/node:alpine AS build-frontend
 
-RUN corepack enable pnpm
+RUN apk add pnpm
 
 WORKDIR /build
 
@@ -10,20 +10,48 @@ RUN pnpm i
 
 RUN pnpm run build
 
-FROM python:3.13-slim
+# Inspired by https://hynek.me/articles/docker-uv/
+
+FROM ghcr.io/astral-sh/uv:python3.13-alpine AS builder
+
+SHELL ["sh", "-exc"]
+
+ENV UV_LINK_MODE=copy \
+    UV_COMPILE_BYTECODE=1 \
+    UV_PYTHON_DOWNLOADS=never \
+    UV_PROJECT_ENVIRONMENT=/app
+
+COPY uv.lock uv.lock
+COPY pyproject.toml pyproject.toml
+
+RUN --mount=type=cache,target=/root/.cache \
+    uv sync --locked --no-dev --no-install-project
+
+COPY . /src
+
+WORKDIR /src
+
+RUN --mount=type=cache,target=/root/.cache \
+    uv sync --locked --no-dev --no-editable
+
+FROM python:3.13-alpine
+
+STOPSIGNAL SIGINT
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY docker-entrypoint.sh /docker-entrypoint.sh
 
-RUN pip install -r requirements.txt
+SHELL ["sh", "-exc"]
 
-COPY . .
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
-ENV WEBSITE_PATH=frontend/dist
+COPY --from=builder /app /app
 
-COPY --from=build-frontend /build/dist frontend/dist
+COPY alembic.ini /app/alembic.ini
+
+COPY --from=build-frontend /build/dist /app/public
+
+ENV WEBSITE_PATH=public
 
 EXPOSE 5000
-
-CMD [ "sh", "-c", "python3 -m src.main" ]

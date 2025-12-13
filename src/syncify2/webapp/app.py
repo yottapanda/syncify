@@ -4,8 +4,8 @@ from fastapi import FastAPI
 from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
-from common import conf
-from webapp import api_v1
+from syncify2.common import conf
+from syncify2.webapp import api_v1
 
 app = FastAPI()
 

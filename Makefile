@@ -42,6 +42,6 @@ prod: network db/wait prod/kill prod/build prod/run
 prod/build:
 	docker buildx build . -t syncify2
 prod/run:
-	docker run --rm -it -p 5000:5000 --network syncify2 --env-file .env -e DB_HOST=syncify2_db -e HOST=0.0.0.0 --name syncify2 syncify2
+	docker run --rm -it -p 5000:5000 --network syncify2 --env-file .env -e DB_HOST=syncify2_db -e HOST=0.0.0.0 -e BASE_URI=http://127.0.0.1:5000 --name syncify2 syncify2
 prod/kill:
 	docker kill syncify2 || true

@@ -1,8 +1,8 @@
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
-from common import db, spotify
-from common.db import SyncRequest, User
+from syncify2.common import spotify, db
+from syncify2.common.db import SyncRequest, User
 
 
 def run():

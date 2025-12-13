@@ -1,8 +1,9 @@
 import time
 from datetime import datetime
 
-from common import conf, alembic
-from scheduler import scheduler
+from syncify2.common import alembic
+from syncify2.common import conf
+from syncify2.scheduler import scheduler
 
 if __name__ == "__main__":
     alembic.check()

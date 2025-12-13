@@ -12,7 +12,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Session
 
-from common import conf
+from syncify2.common import conf
 
 engine = create_engine(conf.db_conn_string)
 

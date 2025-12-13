@@ -1,7 +1,7 @@
 import time
 
-from common import alembic
-from worker import worker
+from syncify2.common import alembic
+from syncify2.worker import worker
 
 if __name__ == "__main__":
     alembic.check()

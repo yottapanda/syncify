@@ -1,7 +1,8 @@
 import uvicorn
 
-from common import conf, alembic
-from webapp.app import app
+from syncify2.common import alembic
+from syncify2.common import conf
+from syncify2.webapp.app import app
 
 if __name__ == "__main__":
     alembic.check()
