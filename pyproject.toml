@@ -8,17 +8,17 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
-    "alembic~=1.17.1",
-    "fastapi~=0.121.0",
-    "SQLAlchemy~=2.0.40",
+    "alembic~=1.17.2",
+    "fastapi~=0.124.4",
+    "SQLAlchemy~=2.0.45",
     "python-dotenv~=1.2.1",
-    "spotipy~=2.25.1",
+    "spotipy~=2.25.2",
     "uvicorn~=0.38.0",
-    "pydantic~=2.12.4",
+    "pydantic~=2.12.5",
     "alembic~=1.17.1",
     "psycopg2-binary~=2.9.10",
     "fastapi_sessions==0.3.2",
-    "stripe~=13.2.0"
+    "stripe~=14.0.1"
 ]
 
 [project.scripts]
@@ -26,7 +26,3 @@ syncify2 = "syncify2:main"
 scheduler = "scheduler:main"
 webapp = "webapp:main"
 worker = "worker:main"
-
-[build-system]
-requires = ["uv_build>=0.9.7,<0.10.0"]
-build-backend = "uv_build"

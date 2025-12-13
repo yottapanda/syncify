@@ -22,10 +22,10 @@ def _read_bool(name: str, default: bool = False) -> bool:
     return _read(name, default=str(default), optional=True).lower() == "true"
 
 
-host = _read("HOST", "localhost")
+host = _read("HOST", "127.0.0.1")
 port = _read_int("PORT", 5000)
 
-base_uri = _read("BASE_URI", "http://localhost:5173").removesuffix("/")
+base_uri = _read("BASE_URI", "http://127.0.0.1:5173").removesuffix("/")
 
 db_host = _read("DB_HOST", "localhost")
 db_port = _read_int("DB_PORT", 5432)
