@@ -1,6 +1,7 @@
 import secrets
 from uuid import uuid4, UUID
 
+import posthog
 from fastapi import Request, Depends, HTTPException, APIRouter
 from fastapi_sessions.backends.session_backend import BackendError
 from sqlalchemy import select
@@ -14,6 +15,14 @@ from syncify2.webapp.session import SessionData
 from syncify2.webapp.types import UserResponse
 
 router = APIRouter(prefix="/api/v1", tags=["API v1"])
+
+
+@router.get("/posthog")
+def posthog_config():
+    return {
+        "host": posthog.host,
+        "public_key": posthog.api_key,
+    }
 
 
 @router.get("/auth/login")
@@ -65,14 +74,17 @@ async def logout(session_id: UUID = Depends(session.cookie)):
 
 
 @router.post("/auth/delete", dependencies=[Depends(session.cookie)])
-def delete_user(
+async def delete_user(
     db_session: db.SessionDep,
     session_data: SessionData | BackendError = Depends(session.verifier),
+    session_id: UUID = Depends(session.cookie)
 ):
     if session_data.user_id is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not logged in")
     db_session.query(User).filter(User.id == session_data.user_id).delete()
     db_session.commit()
+    await session.backend.delete(session_id)
+    posthog.capture("delete_account", distinct_id=session_data.user_id)
 
 
 @router.put("/jobs", dependencies=[Depends(session.cookie)])
@@ -94,6 +106,7 @@ def enqueue(
     sync_request = SyncRequest(user_id=session_data.user_id, song_count=count)
     db_session.add(sync_request)
     db_session.commit()
+    posthog.capture("enqueued_sync_request", distinct_id=session_data.user_id, properties={"id": sync_request.id})
 
 
 @router.get("/jobs", dependencies=[Depends(session.cookie)])
@@ -130,3 +143,4 @@ def delete_job(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Job not found")
     db_session.delete(job)
     db_session.commit()
+    posthog.capture("deleted_sync_request", distinct_id=session_data.user_id, properties={"id": job_id})

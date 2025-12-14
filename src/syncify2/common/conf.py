@@ -3,6 +3,7 @@ import os
 import secrets
 
 import dotenv
+import posthog
 
 dotenv.load_dotenv()
 
@@ -37,9 +38,14 @@ db_password = _read("DB_PASSWORD", "syncify")
 
 db_conn_string = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 
-secret_key = _read("SECRET_KEY", secrets.token_hex())
+secret_key = _read("SECRET_KEY", default=secrets.token_hex())
 
 scheduler_interval = datetime.timedelta(seconds=_read_int("SCHEDULER_INTERVAL", 86400))
 
 # Set in docker image, mainly for development
 website_path = _read("WEBSITE_PATH", default="frontend/dist", optional=True)
+
+# Backend/server SDK configuration
+posthog.host = _read("POSTHOG_HOST", default="https://eu.i.posthog.com", optional=True)
+posthog.api_key = _read("POSTHOG_API_KEY", optional=True)
+posthog.debug = _read_bool("POSTHOG_DEBUG", default="127.0.0.1" in base_uri)

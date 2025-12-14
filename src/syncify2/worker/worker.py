@@ -1,3 +1,4 @@
+import posthog
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
@@ -38,6 +39,7 @@ def run():
         db_session.merge(request)
         db_session.commit()
 
+        posthog.capture("sync_complete", distinct_id=request.user_id, properties={"song_count": count, "id": request.id})
         print(
             f"Sync reqeust {request.id} complete for {request.user_id}; {request.song_count} songs"
         )

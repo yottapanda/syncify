@@ -21,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import posthog from "posthog-js";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -87,6 +88,7 @@ function Dashboard() {
                   await handleLogout().catch(() => {
                     toast("Logout failed");
                   });
+                  posthog.reset();
                   await queryClient.invalidateQueries({ queryKey: ["user"] });
                 }}
               >

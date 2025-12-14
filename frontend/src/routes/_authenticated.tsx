@@ -2,6 +2,8 @@ import { createFileRoute, Navigate, Outlet } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getUser } from "@/lib/api/queries.ts";
 import { LoaderCircle } from "lucide-react";
+import {useEffect} from "react";
+import posthog from "posthog-js";
 
 export const Route = createFileRoute("/_authenticated")({
   component: RouteComponent,
@@ -14,6 +16,11 @@ function RouteComponent() {
     retry: false,
     refetchInterval: 60000,
   });
+
+  useEffect(() => {
+    if (!userQuery.data?.id) return;
+    posthog.identify(userQuery.data.id);
+  }, [userQuery.data?.id]);
 
   if (userQuery.isLoading) {
     return (
