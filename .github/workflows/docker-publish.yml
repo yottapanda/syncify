@@ -1,15 +1,19 @@
 name: Docker
 
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
 on:
-  # schedule:
-  #   - cron: '22 14 * * *'
+#   schedule:
+#     - cron: '39 21 * * *'
   push:
-    branches: [ "main" ]
-    # # Publish semver tags as releases.
-    # tags: [ 'v*.*.*' ]
+    branches: [ "master" ]
+    # Publish semver tags as releases.
+    tags: [ 'v*.*.*' ]
   pull_request:
-    branches: [ "main" ]
-  workflow_dispatch:
+    branches: [ "master" ]
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -17,8 +21,10 @@ env:
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
 
+
 jobs:
   build:
+
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,8 +36,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          lfs: "true"
 
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer

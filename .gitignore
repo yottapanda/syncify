@@ -1,5 +1,7 @@
-/.idea/
-/node_modules/
-/static/stylesheet.css
+/build/
+/*.egg-info/
+/.venv/
+/data/
 /.env
-/tmp/
+/.cache
+__pycache__/

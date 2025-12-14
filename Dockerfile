@@ -1,31 +1,57 @@
-FROM docker.io/library/node:alpine AS build-tailwind
+FROM docker.io/library/node:alpine AS build-frontend
+
+RUN apk add pnpm
 
 WORKDIR /build
 
-COPY . .
-
-RUN corepack enable pnpm
+COPY frontend .
 
 RUN pnpm i
 
-RUN pnpx tailwindcss -i tailwind.css -o static/stylesheet.css -m
+RUN pnpm run build
 
-FROM docker.io/library/golang:alpine AS build-go
+# Inspired by https://hynek.me/articles/docker-uv/
 
-WORKDIR /build
+FROM ghcr.io/astral-sh/uv:python3.13-alpine AS builder
 
-COPY . .
+SHELL ["sh", "-exc"]
 
-COPY --from=build-tailwind /build/static/stylesheet.css static/
+ENV UV_LINK_MODE=copy \
+    UV_COMPILE_BYTECODE=1 \
+    UV_PYTHON_DOWNLOADS=never \
+    UV_PROJECT_ENVIRONMENT=/app
 
-RUN go build -o out/syncify cmd/main/main.go
+COPY uv.lock uv.lock
+COPY pyproject.toml pyproject.toml
 
-FROM docker.io/library/alpine:latest
+RUN --mount=type=cache,target=/root/.cache \
+    uv sync --locked --no-dev --no-install-project
+
+COPY . /src
+
+WORKDIR /src
+
+RUN --mount=type=cache,target=/root/.cache \
+    uv sync --locked --no-dev --no-editable
+
+FROM python:3.13-alpine
+
+STOPSIGNAL SIGINT
 
 WORKDIR /app
 
-COPY --from=build-go /build/out/syncify .
+COPY docker-entrypoint.sh /docker-entrypoint.sh
 
-EXPOSE 8000
+SHELL ["sh", "-exc"]
 
-CMD ["./syncify"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+COPY --from=builder /app /app
+
+COPY alembic.ini /app/alembic.ini
+
+COPY --from=build-frontend /build/dist /app/public
+
+ENV WEBSITE_PATH=public
+
+EXPOSE 5000
