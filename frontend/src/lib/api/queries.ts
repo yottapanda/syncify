@@ -56,3 +56,14 @@ export async function handleLogout() {
     throw new Error((await response.json()).detail);
   }
 }
+
+export async function handleDeleteAccount() {
+  const response = await fetch("/api/v1/auth/delete", {
+    method: "POST",
+  });
+  if (response.ok) {
+     window.location.assign("/")
+  } else {
+    throw new Error((await response.json()).detail);
+  }
+}

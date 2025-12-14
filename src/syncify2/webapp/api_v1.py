@@ -53,6 +53,8 @@ def get_user(
     if session_data.user_id is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not logged in")
     client = spotify.get_client(session_data.user_id, db_session)
+    if client is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not logged in")
     user = client.me()
     return UserResponse(id=user["id"], display_name=user["display_name"])
 
@@ -60,6 +62,17 @@ def get_user(
 @router.get("/auth/logout", dependencies=[Depends(session.cookie)])
 async def logout(session_id: UUID = Depends(session.cookie)):
     await session.backend.delete(session_id)
+
+
+@router.post("/auth/delete", dependencies=[Depends(session.cookie)])
+def delete_user(
+    db_session: db.SessionDep,
+    session_data: SessionData | BackendError = Depends(session.verifier),
+):
+    if session_data.user_id is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not logged in")
+    db_session.query(User).filter(User.id == session_data.user_id).delete()
+    db_session.commit()
 
 
 @router.put("/jobs", dependencies=[Depends(session.cookie)])

@@ -79,7 +79,7 @@ def sync(spotify: Spotify):
     for playlist_num, playlist_chunk in enumerate(track_uris, start=1):
         playlist_id = get_playlist_id(
             spotify,
-            "Syncify (Liked Songs) " + str(playlist_num) + "/" + str(len(track_uris)),
+            "Syncify " + str(playlist_num) + "/" + str(len(track_uris)),
         )
         spotify.playlist_replace_items(playlist_id, [])
 

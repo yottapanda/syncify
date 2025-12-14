@@ -1,17 +1,26 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {createFileRoute} from "@tanstack/react-router";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {
   deleteJob,
   enqueueJob,
-  getJobs,
+  getJobs, handleDeleteAccount,
   handleLogout,
 } from "@/lib/api/queries.ts";
-import { Button } from "@/components/ui/button.tsx";
-import { User } from "@/lib/api/types.ts";
-import { RefreshCcw, X } from "lucide-react";
-import { toast } from "sonner";
-import { Progress } from "@/components/ui/progress.tsx";
-import { relative_time } from "@/lib/utils.ts";
+import {Button} from "@/components/ui/button.tsx";
+import {User} from "@/lib/api/types.ts";
+import {RefreshCcw, X} from "lucide-react";
+import {toast} from "sonner";
+import {Progress} from "@/components/ui/progress.tsx";
+import {relative_time} from "@/lib/utils.ts";
+import {useState} from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -20,6 +29,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function Dashboard() {
   const queryClient = useQueryClient();
   const user: User | undefined = queryClient.getQueryData(["user"]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const jobsQuery = useQuery({
     queryKey: ["jobs"],
@@ -46,6 +56,13 @@ function Dashboard() {
     enabled: false,
   });
 
+  const deleteAccountMutation = useMutation({
+    mutationFn: handleDeleteAccount,
+    onError: (e) => {
+      toast(e?.message ?? "Failed to delete account");
+    },
+  });
+
   async function handleDelete(jobId: number) {
     await deleteJob(jobId).catch((e) => toast(e.message));
     await queryClient.invalidateQueries({ queryKey: ["jobs"] });
@@ -58,13 +75,12 @@ function Dashboard() {
         <div className="flex items-center gap-4">
           {user && (
             <>
-              <a
-                className="text-primary"
-                href={`https://open.spotify.com/user/${user.id}`}
-                target="_blank"
+              <Button
+                variant="link"
+                onClick={() => window.open(`https://open.spotify.com/user/${user.id}`, '_blank')}
               >
                 {user.display_name}
-              </a>
+              </Button>
               <Button
                 variant="ghost"
                 onClick={async () => {
@@ -76,10 +92,39 @@ function Dashboard() {
               >
                 Logout
               </Button>
+              <Button variant="link" onClick={() => setDeleteDialogOpen(true)}>
+                Delete Account
+              </Button>
             </>
           )}
         </div>
       </div>
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete account?</DialogTitle>
+            <DialogDescription>
+              This action is permanent. It will remove your Syncify account and all associated data. You will need to log in again to recreate it.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={deleteAccountMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteAccountMutation.mutate()}
+              disabled={deleteAccountMutation.isPending}
+            >
+              {deleteAccountMutation.isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <div className="flex flex-wrap items-center justify-end gap-4">
         <p className="text-sm">Syncing every 24 hours</p>
         <Button onClick={() => enqueueJobQuery.refetch()}>Enqueue Sync</Button>

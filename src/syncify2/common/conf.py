@@ -9,8 +9,10 @@ dotenv.load_dotenv()
 
 def _read(name: str, default: str = None, optional: bool = False) -> str:
     value = os.environ.get(name, default)
+    if value == "":
+        value = None
     if not optional and not value:
-        raise Exception("Environment variable {name} is not set")
+        raise Exception(f"Environment variable {name} is not set")
     return value
 
 
@@ -40,4 +42,4 @@ secret_key = _read("SECRET_KEY", secrets.token_hex())
 scheduler_interval = datetime.timedelta(seconds=_read_int("SCHEDULER_INTERVAL", 86400))
 
 # Set in docker image, mainly for development
-website_path = _read("WEBSITE_PATH", default="frontend/dist")
+website_path = _read("WEBSITE_PATH", default="frontend/dist", optional=True)

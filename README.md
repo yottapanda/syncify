@@ -9,11 +9,13 @@ For some reason doing this has always been impossible; it has bugged me for year
 1. Go to [https://syncify.yottapanda.com](https://syncify.yottapanda.com)
 2. Press "Login with Spotify"
 3. When prompted, allow access
-4. Press the "Sync" button
+4. Press the "Enqueue Sync" button
 5. Wait (it takes about 20 seconds to synchronize my ~1250 Liked Songs)
 6. Check your library for your new playlist(s)
 
 The tool will update the same playlists by name every time you press "Enqueue Sync" so if you want to keep an iteration, just rename it and the tool will create a new playlist the next time around.
+
+While you have an account, the tool will update your liked songs automatically every 24 hours.
 
 ## Self-Hosting
 

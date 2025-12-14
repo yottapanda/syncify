@@ -10,7 +10,11 @@ from sqlalchemy import (
     Float,
     func,
 )
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Session
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    mapped_column,
+    Session,
+)
 
 from syncify2.common import conf
 
@@ -46,7 +50,12 @@ class SyncRequest(Base, TimestampMixin):
     __tablename__ = "sync_requests"
 
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id = mapped_column(String, ForeignKey("users.id"), nullable=False, index=True)
+    user_id = mapped_column(
+        String,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     song_count = mapped_column(Integer, nullable=False, default=0)
     progress = mapped_column(Float, nullable=False, default=0.0)
     completed = mapped_column(TIMESTAMP(True), nullable=True, index=True)
