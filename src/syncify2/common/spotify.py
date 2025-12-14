@@ -43,7 +43,12 @@ def get_playlist_id(spotify: Spotify, playlist_name):
                 return playlist["id"]
 
     user = spotify.current_user()
-    playlist = spotify.user_playlist_create(user["id"], playlist_name, public=False)
+    playlist = spotify.user_playlist_create(
+        user["id"],
+        playlist_name,
+        public=False,
+        description="A copy of this user's liked songs",
+    )
     return playlist["id"]
 
 

@@ -31,7 +31,7 @@ def downgrade() -> None:
     op.add_column(
         "users",
         sa.Column(
-            "stripe_customer_id", sa.VARCHAR(), autoincrement=False, nullable=False
+            "stripe_customer_id", sa.VARCHAR(), autoincrement=False, nullable=True
         ),
     )
     # ### end Alembic commands ###
