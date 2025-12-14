@@ -19,19 +19,19 @@ worker:
 # Docker setup commands
 
 network:
-	docker network create syncify2 || true
-	docker volume create syncify2_db || true
+	docker network create syncify || true
+	docker volume create syncify_db || true
 
 
 # Database commands
 
 db: network db/kill db/start db/upgrade
 db/kill:
-	docker container rm -f syncify2_db || true
+	docker container rm -f syncify_db || true
 db/start:
-	docker run --rm -d -p 5432:5432 --name syncify2_db --network syncify2 -v syncify2_db:/var/lib/postgresql/data -e POSTGRES_USER=syncify2 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=syncify2 postgres:alpine
+	docker run --rm -d -p 5432:5432 --name syncify_db --network syncify -v syncify_db:/var/lib/postgresql/data -e POSTGRES_PASSWORD=syncify postgres:alpine
 db/wait:
-	while ! docker exec syncify2_db pg_isready -U syncify2; do sleep 1; done
+	while ! docker exec syncify_db pg_isready -U postgres; do sleep 1; done
 db/upgrade: db/wait
 	alembic upgrade head
 
@@ -40,8 +40,8 @@ db/upgrade: db/wait
 
 prod: network db/wait prod/kill prod/build prod/run
 prod/build:
-	docker buildx build . -t syncify2
+	docker buildx build . -t syncify
 prod/run:
-	docker run --rm -it -p 5000:5000 --network syncify2 --env-file .env -e DB_HOST=syncify2_db -e HOST=0.0.0.0 -e BASE_URI=http://127.0.0.1:5000 --name syncify2 syncify2
+	docker run --rm -it -p 5000:5000 --network syncify --env-file .env -e DB_HOST=syncify_db -e BASE_URI=http://127.0.0.1:5000 --name syncify syncify
 prod/kill:
 	docker kill syncify2 || true

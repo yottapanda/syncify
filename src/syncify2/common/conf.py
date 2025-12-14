@@ -22,22 +22,22 @@ def _read_bool(name: str, default: bool = False) -> bool:
     return _read(name, default=str(default), optional=True).lower() == "true"
 
 
-host = _read("HOST", "127.0.0.1")
+host = _read("HOST", "0.0.0.0")
 port = _read_int("PORT", 5000)
 
-base_uri = _read("BASE_URI", "http://127.0.0.1:5173").removesuffix("/")
+base_uri = _read("BASE_URI", "http://127.0.0.1:5000").removesuffix("/")
 
 db_host = _read("DB_HOST", "localhost")
 db_port = _read_int("DB_PORT", 5432)
-db_name = _read("DB_NAME", "syncify2")
-db_user = _read("DB_USER", "syncify2")
-db_password = _read("DB_PASSWORD", "postgres")
+db_name = _read("DB_NAME", "postgres")
+db_user = _read("DB_USER", "postgres")
+db_password = _read("DB_PASSWORD", "syncify")
 
 db_conn_string = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 
 secret_key = _read("SECRET_KEY", secrets.token_hex())
 
-# Just for docker image
-website_path = _read("WEBSITE_PATH", optional=True)
-
 scheduler_interval = datetime.timedelta(seconds=_read_int("SCHEDULER_INTERVAL", 86400))
+
+# Set in docker image, mainly for development
+website_path = _read("WEBSITE_PATH", default="frontend/dist")

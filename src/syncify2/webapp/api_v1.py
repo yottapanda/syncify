@@ -7,7 +7,7 @@ from sqlalchemy import select
 from starlette import status
 from starlette.responses import Response, RedirectResponse
 
-from syncify2.common import spotify, conf, db
+from syncify2.common import spotify, db
 from syncify2.common.db import User, SyncRequest
 from syncify2.webapp import session
 from syncify2.webapp.session import SessionData
@@ -42,9 +42,7 @@ async def callback(
     db_session.merge(User(id=user["id"], refresh_token=token_response["refresh_token"]))
     db_session.commit()
     await session.backend.update(session_id, SessionData(user_id=user["id"]))
-    return RedirectResponse(
-        conf.base_uri + "/dashboard", status_code=status.HTTP_302_FOUND
-    )
+    return RedirectResponse("/dashboard", status_code=status.HTTP_302_FOUND)
 
 
 @router.get("/auth/user", dependencies=[Depends(session.cookie)])

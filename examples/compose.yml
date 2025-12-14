@@ -3,7 +3,25 @@ services:
     image: ghcr.io/yottapanda/syncify:main
     restart: unless-stopped
     user: 1000:1000 # Change to your user id (find using `id -u` and `id -g`)
-    env_file:
-      - .env
+    depends_on:
+      - db
+    environment:
+      BASE_URI: http://127.0.0.1:5000 # public url of your instance
+      SECRET_KEY: changeme
+      SPOTIPY_CLIENT_ID: changeme
+      SPOTIPY_CLIENT_SECRET: changeme
+      DB_HOST: db
+      DB_PASSWORD: syncify
     ports:
-      - "8000:8000"
+      - "5000:5000"
+
+  db:
+    image: docker.io/library/postgres:alpine
+    restart: unless-stopped
+    volumes:
+      - syncify-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: syncify
+
+volumes:
+  syncify-db:
