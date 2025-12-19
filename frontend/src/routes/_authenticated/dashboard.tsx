@@ -70,10 +70,10 @@ function Dashboard() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-space-between">
         <h1 className="flex-1 text-3xl font-bold">Syncify</h1>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-end gap-x-4 flex-wrap">
           {user && (
             <>
               <Button
@@ -127,7 +127,7 @@ function Dashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <div className="flex flex-wrap items-center justify-end gap-4">
+      <div className="flex flex-wrap items-center justify-end gap-4 mt-8">
         <p className="text-sm">Syncing every 24 hours</p>
         <Button onClick={() => enqueueJobQuery.refetch()}>Enqueue Sync</Button>
         <Button

@@ -1,7 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button.tsx";
-import { getUser, handleLogin } from "@/lib/api/queries.ts";
-import { useEffect } from "react";
+import {createFileRoute, useNavigate} from "@tanstack/react-router";
+import {Button} from "@/components/ui/button.tsx";
+import {getUser, handleLogin} from "@/lib/api/queries.ts";
+import {useEffect} from "react";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -14,19 +14,19 @@ function Index() {
     getUser()
       .then((user) => {
         if (user) {
-          navigate({ to: "/dashboard" }).then();
+          navigate({to: "/dashboard"}).then();
         }
       })
       .catch();
   }, []);
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="flex flex-col gap-4 items-center">
+    <main className="flex-1 flex justify-center items-center">
+      <div className="flex flex-col gap-4 items-center p-4">
         <h1 className="text-3xl font-bold">Syncify</h1>
-        <p>Sync your Spotify 'Liked Songs' playlist to a sharable one.</p>
+        <p className="text-center">Sync your Spotify 'Liked Songs' playlist to a sharable one.</p>
         <Button onClick={handleLogin}>Login with Spotify</Button>
       </div>
-    </div>
+    </main>
   );
 }
