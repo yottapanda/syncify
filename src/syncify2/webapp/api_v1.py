@@ -43,7 +43,7 @@ async def callback(
 ):
     if request.query_params.get("state") != session_data.state:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Invalid state")
-    token_response = spotify.oauth.get_access_token(request.query_params.get("code"))
+    token_response = spotify.oauth.get_access_token(request.query_params.get("code"), check_cache=False)
     import spotipy
 
     client = spotipy.Spotify(auth=token_response["access_token"])
